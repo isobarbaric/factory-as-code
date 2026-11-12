@@ -35,7 +35,7 @@ function validate(config, base, schema) {
 function build() {
   const base = path.resolve(".process");
   const configPath = path.join(base, "process.ts");
-  const schemaPath = path.resolve(__dirname, "../schema.ts");
+  const schemaPath = path.resolve(__dirname, "../schemas/index.ts");
   if (!fs.existsSync(configPath)) throw new Error("Missing .process/process.ts");
   const temp = fs.mkdtempSync(path.resolve(".process-build-"));
   try {

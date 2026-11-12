@@ -1,4 +1,4 @@
-import { EntityType, type ProcessConfig } from "../schema";
+import { EntityType, type ProcessConfig } from "../schemas";
 
 export default {
   entities: [
