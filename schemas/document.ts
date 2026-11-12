@@ -4,6 +4,7 @@ export interface Document {
   repo_id: string;
   document_id: string;
   entity_name: string;
+  title: string;
   content: string;
   metadata: JsonObject;
 }

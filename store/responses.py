@@ -6,9 +6,7 @@ from pydantic import BaseModel, JsonValue, RootModel
 from typing_extensions import NotRequired, TypedDict
 
 
-class EntityDefinition(TypedDict):
-    name: str
-    type: Literal["document", "ticket", "files"]
+from .entities import Entity
 
 
 class DirectoryRoot(TypedDict):
@@ -16,7 +14,7 @@ class DirectoryRoot(TypedDict):
 
 
 class ManifestFields(TypedDict):
-    entities: list[EntityDefinition]
+    entities: list[Entity]
     integrations: NotRequired[
         list[
             Literal[
@@ -42,6 +40,7 @@ class ProcessManifest(RootModel[ManifestFields]):
 
 
 class DocumentSummary(BaseModel):
+    title: str
     document_id: str
     entity_name: str
 

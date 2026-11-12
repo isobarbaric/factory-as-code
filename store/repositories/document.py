@@ -12,7 +12,7 @@ class DocumentRepository:
     def list(
         self, repo_id: str, entity_name: str | None = None, cursor: str | None = None
     ) -> dict:
-        query = select(Document.document_id, Document.entity_name).where(
+        query = select(Document.document_id, Document.entity_name, Document.title).where(
             Document.repo_id == repo_id
         )
         if cursor is not None:

@@ -30,7 +30,7 @@ class ReadToolsTest(unittest.TestCase):
             for repo in ("allowed", "hidden"):
                 session.add(
                     Document(
-                        repo_id=repo, document_id="1", entity_name="Plan", content=repo
+                        repo_id=repo, document_id="1", entity_name="Plan", title="Plan title", content=repo
                     )
                 )
                 for i in range(51):
@@ -51,7 +51,7 @@ class ReadToolsTest(unittest.TestCase):
             root = Path(temp)
             manifest = {
                 "entities": [
-                    {"name": "Bug", "type": "ticket"},
+                    {"name": "Bug", "type": "ticket", "statuses": ["open", "closed"]},
                     {"name": "Plan", "type": "document"},
                 ]
             }
@@ -76,6 +76,7 @@ class ReadToolsTest(unittest.TestCase):
                     "get_document": {
                         "repo_id",
                         "document_id",
+                        "title",
                         "entity_name",
                         "content",
                         "metadata",
@@ -130,7 +131,7 @@ class ReadToolsTest(unittest.TestCase):
                 docs = await call("list_documents", entity_name="Plan")
                 self.assertEqual(
                     docs["items"],
-                    [{"document_id": "1", "entity_name": "Plan"}],
+                    [{"document_id": "1", "entity_name": "Plan", "title": "Plan title"}],
                 )
                 self.assertEqual(
                     (await call("get_ticket", ticket_id="1"))["title"], "allowed"

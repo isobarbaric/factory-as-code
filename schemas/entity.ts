@@ -4,7 +4,6 @@ export enum EntityType {
   Files = "files",
 }
 
-export interface Entity {
-  name: string;
-  type: EntityType;
-}
+export type Entity =
+  | { name: string; type: EntityType.Document | EntityType.Files; statuses?: never }
+  | { name: string; type: EntityType.Ticket; statuses: readonly [string, ...string[]] };
