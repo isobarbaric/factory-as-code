@@ -1,3 +1,0 @@
--r requirements.txt
-Flask>=3.1,<4
-boto3>=1.35,<2
