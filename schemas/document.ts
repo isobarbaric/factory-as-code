@@ -1,6 +1,6 @@
 import type { JsonObject } from "./json";
 
-export interface DocumentRevision {
+export interface Document {
   repo_name: string;
   document_id: string;
   entity_name: string;
