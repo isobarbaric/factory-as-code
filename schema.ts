@@ -54,3 +54,10 @@ export interface Ticket {
   assignee: string | null;
   metadata?: JsonObject;
 }
+
+export interface Files {
+  repo_name: string;
+  entity_name: string;
+  object_prefix: string;
+  metadata?: JsonObject;
+}
