@@ -15,11 +15,15 @@ def create_app(reader: ProcessReader) -> FastAPI:
     async def unavailable(request: Request, error: RecordUnavailable):
         return JSONResponse(status_code=404, content={"detail": "Record not found"})
 
-    app.get("/api/process")(reader.get_process)
-    app.get("/api/documents")(reader.list_documents)
-    app.get("/api/documents/{document_id:path}")(reader.get_document)
-    app.get("/api/tickets")(reader.list_tickets)
-    app.get("/api/tickets/{ticket_id:path}")(reader.get_ticket)
+    app.add_api_route("/api/process", reader.get_process, methods=["GET"])
+    app.add_api_route("/api/documents", reader.list_documents, methods=["GET"])
+    app.add_api_route(
+        "/api/documents/{document_id:path}", reader.get_document, methods=["GET"]
+    )
+    app.add_api_route("/api/tickets", reader.list_tickets, methods=["GET"])
+    app.add_api_route(
+        "/api/tickets/{ticket_id:path}", reader.get_ticket, methods=["GET"]
+    )
     return app
 
 

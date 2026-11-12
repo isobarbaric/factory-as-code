@@ -1,19 +1,25 @@
-import type { ReactNode } from "react";
+import type { Ticket } from "../../../schemas";
 
 interface TicketTemplateProps {
-  identifier: string;
-  title: string;
-  description: string;
-  properties: ReactNode;
+  ticket: Ticket;
 }
 
-export function TicketTemplate({ identifier, title, description, properties }: TicketTemplateProps) {
-  return <article><div className="ticket">
-    <section>
-      <small>{identifier}</small>
-      <h1>{title}</h1>
-      <div className="content">{description}</div>
-    </section>
-    {properties}
-  </div></article>;
+export function TicketTemplate({ ticket }: TicketTemplateProps) {
+  return (
+    <article>
+      <div className="ticket">
+        <section>
+          <small>{ticket.ticket_id}</small>
+          <h1>{ticket.title}</h1>
+          <div className="content">{ticket.description}</div>
+        </section>
+        <dl className="properties">
+          <dt>Status</dt>
+          <dd>{ticket.status}</dd>
+          <dt>Assignee</dt>
+          <dd>{ticket.assignee ?? "Unassigned"}</dd>
+        </dl>
+      </div>
+    </article>
+  );
 }

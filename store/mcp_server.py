@@ -5,13 +5,13 @@ from mcp.server.fastmcp import FastMCP
 from .reader import ProcessReader, configured_reader
 
 
-def create_server(reader: ProcessReader):
+def create_server(reader: ProcessReader) -> FastMCP:
     server = FastMCP("Process records")
-    server.tool()(reader.get_process)
-    server.tool()(reader.list_documents)
-    server.tool()(reader.get_document)
-    server.tool()(reader.list_tickets)
-    server.tool()(reader.get_ticket)
+    server.add_tool(reader.get_process)
+    server.add_tool(reader.list_documents)
+    server.add_tool(reader.get_document)
+    server.add_tool(reader.list_tickets)
+    server.add_tool(reader.get_ticket)
     return server
 
 

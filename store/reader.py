@@ -7,6 +7,7 @@ from pathlib import Path
 from sqlalchemy import Engine
 from sqlmodel import create_engine
 
+from .models import Document, Ticket
 from .repositories import DocumentRepository, TicketRepository
 from .responses import (
     DocumentResponse,
@@ -22,7 +23,7 @@ class RecordUnavailable(LookupError):
     pass
 
 
-def record_dict(row):
+def _record_dict(row: Document | Ticket | None) -> dict:
     if row is None:
         raise RecordUnavailable("Record not found")
     result = row.model_dump()
@@ -58,11 +59,12 @@ class ProcessReader:
         """Read the current document."""
         self._authorize(repo_id)
         return DocumentResponse.model_validate(
-            record_dict(self.documents.get(repo_id, document_id))
+            _record_dict(self.documents.get(repo_id, document_id))
         )
 
     def list_tickets(
-        self, repo_id: str,
+        self,
+        repo_id: str,
         entity_name: str | None = None,
         status: str | None = None,
         assignee: str | None = None,
@@ -78,7 +80,7 @@ class ProcessReader:
         """Read the full current ticket."""
         self._authorize(repo_id)
         return TicketResponse.model_validate(
-            record_dict(self.tickets.get(repo_id, ticket_id))
+            _record_dict(self.tickets.get(repo_id, ticket_id))
         )
 
 
