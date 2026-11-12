@@ -14,6 +14,16 @@ function validate(config, base, schema) {
     const name = entity.name.trim();
     if (names.has(name)) throw new Error(`Duplicate entity name: ${name}`);
     names.add(name);
+    if (entity.type === schema.EntityType.Ticket) {
+      const statuses = entity.statuses;
+      if (!Array.isArray(statuses) || statuses.length === 0 ||
+          statuses.some(status => typeof status !== "string" || !status || status !== status.trim()) ||
+          new Set(statuses).size !== statuses.length) {
+        throw new Error(`Ticket entity ${name} needs unique, nonblank statuses without surrounding whitespace`);
+      }
+    } else if ("statuses" in entity) {
+      throw new Error(`Only ticket entities may declare statuses: ${name}`);
+    }
     if (!Object.values(schema.EntityType).includes(entity.type)) {
       throw new Error(`Unknown entity type for ${name}: ${entity.type}`);
     }

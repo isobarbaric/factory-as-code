@@ -5,6 +5,7 @@ export interface Document {
   document_id: string;
   entity_name: string;
   version_number: number;
+  title: string;
   content: string;
   metadata: JsonObject;
 }

@@ -5,6 +5,7 @@ from pathlib import Path
 from sqlalchemy import event
 from sqlmodel import Session
 
+from .entities import entity_catalog
 from .models import Document, Files, Ticket
 
 
@@ -33,6 +34,9 @@ def validate_writes(session, flush_context, instances):
             if path is None:
                 raise ValueError(f"No manifest configured for {repo}")
             manifest = json.loads(path.read_text())
-            catalogs[repo] = {entry["name"]: entry["type"] for entry in manifest["entities"]}
-        if catalogs[repo].get(row.entity_name) != kind:
+            catalogs[repo] = entity_catalog(manifest["entities"])
+        entity = catalogs[repo].get(row.entity_name)
+        if entity is None or entity.type != kind:
             raise ValueError(f"{repo} does not declare {row.entity_name!r} as {kind}")
+        if isinstance(row, Ticket) and row.status not in entity.statuses:
+            raise ValueError(f"Invalid status {row.status!r} for {entity.name}")

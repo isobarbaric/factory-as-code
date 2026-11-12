@@ -29,6 +29,7 @@ One row per immutable revision. Primary key: `(repo_name, document_id, version_n
 | `document_id` | text | No | Stable across revisions |
 | `version_number` | integer | No | Positive, starts at 1 |
 | `entity_name` | text | No | Configured document entity |
+| `title` | text | No | Nonblank title at this revision |
 | `content` | text | No | Full text at this revision |
 | `metadata` | jsonb | No | Defaults to `{}` |
 
@@ -63,7 +64,7 @@ One row per object collection. Primary key: `(repo_name, files_id)`. Unique cons
 
 **Document.** Assign a stable `document_id` at creation and start `version_number` at 1. To edit revision 3, insert revision 4 under the same ID and entity name. Enforce uniqueness of the primary key so concurrent edits based on revision 3 cannot both succeed. Read the highest version for the current document or request a specific version for historical content.
 
-**Ticket.** Update the existing row when its status, description, or assignee changes. An unassigned ticket stores `assignee: null`. The current schema accepts a string for status. It does not define a shared status vocabulary or require a ticket history.
+**Ticket.** Update the existing row when its status, description, or assignee changes. An unassigned ticket stores `assignee: null`. Each ticket entity declares an ordered list of allowed statuses. A ticket write must use one of its entity’s statuses.
 
 **Files.** Keep one row for a collection regardless of how many objects it contains. For example, a Test Report with `files_id = "report-184"` can reference the prefix `reports/run-184/`. Listing that prefix retrieves entries such as `results.xml` and `coverage/index.html`. Resolve the prefix within the repo's configured storage namespace. Allocate non-overlapping prefixes. The unique constraint rejects identical prefixes, but the writer must also avoid placing one collection beneath another.
 
@@ -95,3 +96,7 @@ with ProcessSession(engine, manifests={repo: Path(".process/dist/process.json")}
 ```
 
 Use `ProcessSession` for ORM inserts and updates that require manifest validation. Direct SQL and bulk statements bypass the ORM flush hook. The Python attribute `metadata_` maps to the database column `metadata` because SQLAlchemy reserves the attribute name `metadata`.
+
+## Updating existing stores
+
+For an existing documents table, add a nullable text title, backfill each historical row with its document ID or a known title, then enforce a nonblank check and NOT NULL. Fresh tables include these constraints. For each ticket entity, declare all status values currently in use before rebuilding the manifest. To retire a status, first move its tickets to another declared value.
