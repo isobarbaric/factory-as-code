@@ -2,6 +2,15 @@
 
 The CLI builds a project's `.process/process.ts` into a validated JSON manifest.
 
+## TypeScript packages
+
+| Package | Owns |
+| --- | --- |
+| `@process-as-code/process-config` | The manifest shape, entity declarations, and integration enums used by the CLI and config authors. |
+| `@process-as-code/process-records` | The application’s document, ticket, and file record types and their JSON metadata. |
+
+Both are private npm workspaces. Within this checkout, import from the package that owns the type. For a separate project using a sibling checkout, use the relative config import shown below. Existing imports from `schemas` or `schema.ts` must switch to the corresponding package.
+
 ## Local setup
 
 Install Make and uv, then run `make setup`. It installs the Python MCP server dependencies, creates the SQLite tables in `.local/records.db`, and initializes an empty repository registry at `.local/repos.json`. Repeating setup preserves records and registrations.
@@ -47,7 +56,7 @@ The CLI reads `.process/process.ts` and writes `.process/dist/process.json` **in
 The config must default-export a value that satisfies `ProcessConfig`, and its imports must resolve from the config file. For example, if `your-project/` and `process-as-code/` are sibling directories, this works in `your-project/.process/process.ts`:
 
 ```ts
-import { EntityType, type ProcessConfig } from "../../process-as-code/schemas";
+import { EntityType, type ProcessConfig } from "../../process-as-code/packages/process-config";
 
 export default {
   entities: [

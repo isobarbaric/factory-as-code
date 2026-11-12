@@ -45,7 +45,7 @@ function build() {
   const { require: loadTypeScript } = require("tsx/cjs/api");
   const base = path.resolve(".process");
   const configPath = path.join(base, "process.ts");
-  const schemaPath = path.resolve(__dirname, "../schemas/index.ts");
+  const schemaPath = require.resolve("@process-as-code/process-config");
   if (!fs.existsSync(configPath)) throw new Error("Missing .process/process.ts");
   const temp = fs.mkdtempSync(path.resolve(".process-build-"));
   try {
