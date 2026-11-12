@@ -17,7 +17,6 @@ from store.responses import ProcessManifest
 def main():
     root = Path.cwd()
     repos = Path(os.environ["PROCESS_REPOS"])
-    url = os.environ["DATABASE_URL"]
     if sys.argv[1:] == ["--client-config"]:
         print(
             json.dumps(
@@ -34,7 +33,7 @@ def main():
                                 "-m",
                                 "store.mcp_server",
                             ],
-                            "env": {"DATABASE_URL": url, "PROCESS_REPOS": str(repos)},
+                            "env": {"DATABASE_URL": os.environ["DATABASE_URL"], "PROCESS_REPOS": str(repos)},
                         }
                     }
                 },
@@ -66,7 +65,7 @@ def main():
         return
 
     repos.parent.mkdir(parents=True, exist_ok=True)
-    SQLModel.metadata.create_all(create_engine(url))
+    SQLModel.metadata.create_all(create_engine(os.environ["DATABASE_URL"]))
     with repos.with_suffix(".lock").open("a") as lock:
         fcntl.flock(lock, fcntl.LOCK_EX)
         if not repos.exists():
