@@ -6,7 +6,7 @@ from pathlib import Path
 
 import boto3
 from botocore.exceptions import BotoCoreError, ClientError
-from flask import Flask, abort, redirect, render_template, request, session, url_for
+from flask import Flask, abort, redirect, send_from_directory, request, session, url_for
 from sqlmodel import create_engine, select
 
 from process_store import Document, Files, ProcessSession, Ticket
@@ -14,7 +14,8 @@ from process_store.entities import entity_catalog
 
 
 def create_app():
-    app = Flask(__name__)
+    dist = Path(__file__).resolve().parents[1] / "frontend/dist"
+    app = Flask(__name__, static_folder=str(dist / "assets"), static_url_path="/assets")
     app.secret_key = secrets.token_bytes(32)
     repo = os.environ["PROCESS_REPO"]
     manifest = Path(os.environ.get("PROCESS_MANIFEST", ".process/dist/process.json"))
@@ -31,22 +32,16 @@ def create_app():
         name = request.args.get("entity")
         return entity_catalog(cfg["entities"]).get(name) or abort(404)
 
-    def render(cfg, **context):
-        session.setdefault("csrf", secrets.token_hex(32))
-        return render_template("workspace.html", repo=repo, cfg=cfg, **context)
-
     @app.get("/")
     def home():
-        entities = config()["entities"]
-        if entities:
-            return redirect(url_for("browse", entity=entities[0]["name"]))
-        return redirect(url_for("settings"))
+        return send_from_directory(dist, "index.html")
 
-    @app.get("/settings")
+    @app.get("/api/config")
     def settings():
-        return render(config(), settings=True, config_url=os.environ.get("PROCESS_CONFIG_URL"))
+        return {"repo": repo, "config": config(), "configUrl": os.environ.get("PROCESS_CONFIG_URL"),
+                "csrf": session.setdefault("csrf", secrets.token_hex(32))}
 
-    @app.get("/browse")
+    @app.get("/api/browse")
     def browse():
         cfg = config()
         entity = entity_for(cfg)
@@ -98,10 +93,11 @@ def create_app():
                                if not obj["Key"].endswith("/")]
                 except (BotoCoreError, ClientError):
                     error = "The object store could not list this collection."
-        return render(cfg, entity=entity, items=items, selected=selected, row=row,
-                      versions=versions, summaries=summaries, objects=objects, error=error)
+        return {"items": [{"id": key, "label": label, "summary": summaries.get(key)} for key, label in items],
+                "selected": selected, "record": row.model_dump(exclude={"metadata_"}) if row else None,
+                "versions": versions, "objects": objects, "error": error}
 
-    @app.post("/ticket")
+    @app.post("/api/ticket")
     def update_ticket():
         if not session.get("csrf") or not hmac.compare_digest(session["csrf"], request.form.get("csrf", "")):
             abort(403)
@@ -119,7 +115,7 @@ def create_app():
             row.status = request.form["status"]
             row.assignee = request.form["assignee"].strip() or None
             db.commit()
-        return redirect(url_for("browse", entity=entity.name, id=request.args["id"]), code=303)
+        return {"saved": True}
 
     def object_store():
         return boto3.client("s3", endpoint_url=os.environ.get("PROCESS_S3_ENDPOINT"))
@@ -129,7 +125,7 @@ def create_app():
             abort(409, "This collection has no storage prefix.")
         return f"{repo}/{row.object_prefix.strip('/')}/"
 
-    @app.get("/file")
+    @app.get("/api/file")
     def file():
         entity = entity_for(config())
         with store() as db:
@@ -150,7 +146,7 @@ def create_app():
             if Path(name).suffix.lower() in {".txt", ".md", ".json", ".xml", ".csv", ".log", ".html", ".yaml"}:
                 response = client.get_object(**params, Range="bytes=0-65535") if client.head_object(**params)["ContentLength"] else None
                 preview = response["Body"].read().decode("utf-8", "replace") if response else ""
-            return render(config(), entity=entity, file_name=name, preview=preview, selected=row.files_id)
+            return {"preview": preview}
         except (BotoCoreError, ClientError):
             abort(502, "The object store could not retrieve this file.")
 

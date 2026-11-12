@@ -1,9 +1,9 @@
 # Local process browser
 
-Run the browser on localhost for a trusted repository. It reads existing PostgreSQL records and the built process manifest. Tickets support status and assignee edits. Settings display the manifest.
+Run the browser on localhost for a trusted repository. The React and TypeScript frontend uses Vite and reads existing PostgreSQL records and the built process manifest. Tickets support status and assignee edits. Settings display the manifest.
 
 ```sh
-npm ci && npm run build
+npm ci && npm run build && npm run ui:build
 python -m venv .venv
 . .venv/bin/activate
 pip install -r requirements-ui.txt
@@ -12,7 +12,7 @@ export DATABASE_URL='postgresql+psycopg://localhost/process'
 flask --app process_ui.app run
 ```
 
-Open http://127.0.0.1:5000. Initialize a fresh database using the record store instructions in [the data model](data-model.md). Existing databases need the document title change described there. The browser displays empty states until records are present.
+Open http://127.0.0.1:5000 for the built React app. For hot reload, keep the API running and run `npm run ui:dev` in another terminal. Open the Vite URL. The module sidebar follows the manifest entity order. The Agent panel is an interactive preview with a canned reply kept in browser memory. Initialize a fresh database using the record store instructions in [the data model](data-model.md). Existing databases need the document title change described there. The browser displays empty states until records are present.
 
 The manifest defaults to `.process/dist/process.json`. Set `PROCESS_MANIFEST` to select another build. Set `PROCESS_CONFIG_URL` to a trusted GitHub blob URL for that build's source revision to enable the settings link.
 

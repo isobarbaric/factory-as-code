@@ -1,0 +1,31 @@
+:root {
+  --linen: oklch(96.8% .001 48.7); --line: oklch(94.1% .001 48.7); --edge: oklch(88.7% .001 48.7);
+  --ink: oklch(21.9% .007 48.7); --muted: oklch(49% .006 48.7);
+  font: 14px/1.5 "Söhne", "Helvetica Neue", Arial, sans-serif; color: var(--ink); background: white;
+}
+* { box-sizing: border-box; } body, h1, h2, p { margin: 0; } button, select, input, textarea { font: inherit; color: inherit; }
+button, select, input { border: 1px solid var(--edge); background: white; border-radius: 6px; padding: 5px 9px; }
+button, select { cursor: pointer; } button:disabled { opacity: .5; }
+a { color: inherit; } svg { width: 16px; height: 16px; stroke-width: 1.65; vertical-align: middle; flex-shrink: 0; }
+.shell { display: flex; min-height: 100dvh; }
+.sidebar { width: 202px; flex-shrink: 0; background: var(--linen); border-right: 1px solid var(--edge); display: flex; flex-direction: column; padding: 0 8px 8px; }
+.sidebar header,.bar,.agent header { display: flex; gap: 9px; align-items: center; height: 46px; }
+.sidebar header { padding: 0 9px; } .sidebar h2,.records h2 { color: var(--muted); font-size: 12px; font-weight: 550; margin: 18px 10px 6px; }
+nav a,.settings,.records a { display: flex; gap: 9px; align-items: center; padding: 7px 10px; border-radius: 6px; text-decoration: none; overflow-wrap: anywhere; }
+a[aria-current=page],nav a:hover,.settings:hover,.records a:hover { background: var(--line); }
+.settings { margin-top: auto; } main { flex: 1; min-width: 0; }
+.bar { border-bottom: 1px solid var(--edge); padding: 0 14px; font-size: 13px; } .bar span,small { color: var(--muted); }
+.bar strong { font-weight: 550; } button svg { margin-right: 5px; } .end { margin-left: auto; } .icon { padding: 5px; display: inline-flex; border: 0; background: transparent; } .icon svg { margin: 0; }
+.workspace { display: grid; grid-template-columns: clamp(155px,18vw,235px) minmax(0,1fr); min-height: calc(100dvh - 46px); }
+.records { padding: 0 7px; border-right: 1px solid var(--line); } .records a { display: block; } small { display: block; font-size: 12px; }
+article { padding: clamp(18px,3vw,48px); overflow-wrap: anywhere; min-width: 0; } h1 { font-size: clamp(24px,2.4vw,34px); line-height: 1.22; letter-spacing: -.035em; margin: 12px 0 20px; } h2 { font-size: 15px; margin: 22px 0 10px; }
+article p { margin: 12px 0; color: var(--muted); } .content,pre { white-space: pre-wrap; max-width: 72ch; line-height: 1.65; } .revision { display: flex; align-items: center; gap: 7px; color: var(--muted); }
+.ticket { display: flex; flex-wrap: wrap; gap: 24px; } .ticket section { flex: 2 1 225px; } .properties { flex: 1 1 140px; border-left: 1px solid var(--line); padding-left: 16px; } .properties h2 { margin-top: 0; }
+.properties input,.properties select { display: block; width: 100%; margin: 4px 0 12px; }
+table { width: 100%; border-collapse: collapse; } td,th { text-align: left; padding: 8px; border-bottom: 1px solid var(--line); } dd { margin: 0 0 10px; }
+ul { list-style: none; padding: 0; } li a { display: block; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.agent { position: sticky; top: 0; width: clamp(240px,24vw,340px); height: 100dvh; display: flex; flex-direction: column; border-left: 1px solid var(--edge); background: white; }
+.agent header { padding: 0 14px; border-bottom: 1px solid var(--line); } .conversation { flex: 1; overflow: auto; padding: 16px; color: var(--muted); overflow-wrap: anywhere; } .message { color: var(--ink); background: var(--linen); padding: 8px 12px; border-radius: 6px; margin: 14px 0 6px; }
+.composer { border: 1px solid var(--edge); border-radius: 8px; margin: 12px; padding: 8px; display: flex; align-items: flex-end; } textarea { border: 0; flex: 1; min-width: 0; resize: vertical; } .send { background: var(--ink); color: white; }
+@media (max-width: 900px) { .agent { position: fixed; right: 0; width: min(340px,100vw); z-index: 3; box-shadow: -8px 0 24px #0001; } }
+@media (max-width: 700px) { .shell { display: block; } .sidebar { width: 100%; } .settings { margin-top: 6px; } .workspace { display: block; } .records { padding-bottom: 12px; border-bottom: 1px solid var(--line); } .bar span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } .properties { border: 0; padding: 0; } }
