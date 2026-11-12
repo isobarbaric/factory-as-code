@@ -1,4 +1,4 @@
-"""Run against an empty disposable PostgreSQL database via TEST_DATABASE_URL."""
+"""Use temporary SQLite by default, or an empty database specified by TEST_DATABASE_URL."""
 
 import asyncio
 import json
@@ -15,15 +15,13 @@ from sqlmodel import Session, SQLModel, create_engine
 from store import Document, Ticket
 
 
-@unittest.skipUnless(
-    os.environ.get("TEST_DATABASE_URL"), "requires a disposable PostgreSQL database"
-)
 class ReadToolsTest(unittest.TestCase):
     def test_local_agent(self):
-        asyncio.run(self.exercise())
+        with tempfile.TemporaryDirectory() as temp:
+            url = os.environ.get("TEST_DATABASE_URL", f"sqlite:///{temp}/records.db")
+            asyncio.run(self.exercise(url))
 
-    async def exercise(self):
-        url = os.environ["TEST_DATABASE_URL"]
+    async def exercise(self, url):
         engine = create_engine(url)
         SQLModel.metadata.create_all(engine)
         with Session(engine) as session:

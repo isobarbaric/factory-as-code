@@ -1,15 +1,16 @@
 from typing import Any
 
-from sqlalchemy import CheckConstraint, Column, Text, UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy import Column, Text, UniqueConstraint
 from sqlmodel import Field, SQLModel
+
+from .metadata import metadata_constraints, metadata_type
 
 
 class Files(SQLModel, table=True):
     __tablename__ = "files"
     __table_args__ = (
         UniqueConstraint("repo_id", "object_prefix"),
-        CheckConstraint("jsonb_typeof(metadata) = 'object'"),
+        *metadata_constraints(),
     )
 
     repo_id: str = Field(sa_type=Text, primary_key=True)
@@ -17,5 +18,5 @@ class Files(SQLModel, table=True):
     entity_name: str = Field(sa_type=Text)
     object_prefix: str = Field(sa_type=Text)
     metadata_: dict[str, Any] | None = Field(
-        default=None, sa_column=Column("metadata", JSONB(none_as_null=True), nullable=True)
+        default=None, sa_column=Column("metadata", metadata_type(), nullable=True)
     )
