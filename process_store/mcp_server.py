@@ -11,7 +11,6 @@ from sqlmodel import Session, create_engine
 
 from .models import Document, Ticket
 
-
 PAGE_SIZE = 50
 
 
