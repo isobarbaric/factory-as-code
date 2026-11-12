@@ -5,7 +5,7 @@ When someone joins a project, how do they know where to write up a design, what 
 Each project describes how it works in `.process/process.ts`. For example, a team might write its designs as **Blueprints**, track implementation with **Work Orders**, and collect test results in **Test Reports**. Here’s how this repository defines those three kinds of work:
 
 ```ts
-import { EntityType, type ProcessConfig } from "../schemas";
+import { EntityType, type ProcessConfig } from "@process-as-code/process-config";
 
 export default {
   entities: [

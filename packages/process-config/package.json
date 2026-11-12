@@ -1,0 +1,6 @@
+{
+  "name": "@process-as-code/process-config",
+  "private": true,
+  "exports": "./index.ts",
+  "types": "./index.ts"
+}

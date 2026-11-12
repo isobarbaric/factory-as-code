@@ -1,4 +1,4 @@
-import { EntityType, type ProcessConfig } from "../schemas";
+import { EntityType, type ProcessConfig } from "@process-as-code/process-config";
 
 export default {
   entities: [

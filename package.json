@@ -1,6 +1,7 @@
 {
   "name": "process-as-code",
   "private": true,
+  "workspaces": ["packages/*"],
   "bin": {
     "process": "./scripts/process.cjs"
   },
