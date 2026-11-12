@@ -8,9 +8,13 @@ export interface Workspace {
   configUrl: string | null;
 }
 
+export type BrowseDocument = Omit<Document, "metadata">;
+export type BrowseTicket = Omit<Ticket, "metadata">;
+export type BrowseFiles = Omit<Files, "metadata">;
+
 export interface Browse {
-  items: { id: string; label: string; summary?: [string, string | null] }[];
-  record: Document | Ticket | Files | null;
+  items: { id: string; label: string; summary: [status: string, assignee: string | null] | null }[];
+  record: BrowseDocument | BrowseTicket | BrowseFiles | null;
   selected: string | null;
   versions: number[];
   objects: string[];

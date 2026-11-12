@@ -1,10 +1,9 @@
 import { useState, type FormEvent } from "react";
-import type { Ticket } from "../../schemas";
 import { TicketTemplate } from "./templates/TicketTemplate";
-import { query } from "./api";
+import { query, type BrowseTicket } from "./api";
 
 interface TicketViewProps {
-  ticket: Ticket; statuses: readonly string[]; csrf: string; refresh: () => void;
+  ticket: BrowseTicket; statuses: readonly string[]; csrf: string; refresh: () => void;
 }
 
 export function TicketView({ ticket, statuses, csrf, refresh }: TicketViewProps) {
