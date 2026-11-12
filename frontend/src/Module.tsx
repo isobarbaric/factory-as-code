@@ -1,21 +1,15 @@
 import { useState } from "react";
-import { FileText, Download, Folder, ArrowLeft } from "lucide-react";
+import { FileText, Folder } from "lucide-react";
 import type { Entity } from "../../schemas";
 import { query, useResource, type Browse } from "./api";
+import { DocumentTemplate } from "./templates/DocumentTemplate";
+import { Preview } from "./Preview";
 import { TicketView } from "./TicketView";
 
-function Preview({ entity, id, path }: {entity: string; id: string; path: string}) {
-  const url = "/api/file?" + query({entity, id, path});
-  const {data, error} = useResource<{preview: string | null}>(url);
-  return <article><a href={"#" + query({entity, id})}><ArrowLeft /> Collection</a><h1>{path}</h1>
-    <a href={url + "&download=1"}><Download /> Download</a>
-    {error ? <p role="alert">{error}</p> : !data ? <p>Loading preview…</p> : data.preview === null ?
-      <p>Download this file to open it.</p> : <><p>Text preview · first 64 KiB</p><pre>{data.preview}</pre></>}
-  </article>;
-}
+interface ModuleProps { entity: Entity; route: URLSearchParams; csrf: string }
 
-export function Module({entity, route, csrf}: {entity: Entity; route: URLSearchParams; csrf: string}) {
-  const [generation, setGeneration] = useState(0);
+export function Module({entity, route, csrf}: ModuleProps) {
+  const [generation, setGeneration] = useState<number>(0);
   const params = new URLSearchParams(route);
   params.set("entity", entity.name);
   params.delete("path");
@@ -24,18 +18,30 @@ export function Module({entity, route, csrf}: {entity: Entity; route: URLSearchP
   const record = data.record;
   const location = {entity: entity.name, id: data.selected || ""};
   const path = route.get("path");
+  function handleVersionChange(version: number) {
+    window.location.hash = query({...location, version: String(version)});
+  }
+  let detail;
+  if (!record) {
+    detail = <article><h1>{entity.name}</h1><p>No records yet.</p></article>;
+  } else if ("document_id" in record) {
+    detail = <DocumentTemplate title={record.title} content={record.content} version={record.version_number}
+      versions={data.versions} onVersionChange={handleVersionChange} />;
+  } else if ("ticket_id" in record) {
+    detail = <TicketView ticket={record} statuses={entity.statuses || []} csrf={csrf} refresh={() => setGeneration(g => g + 1)} />;
+  } else if (path) {
+    detail = <Preview {...location} path={path} />;
+  } else {
+    let listing = <p>This collection is empty.</p>;
+    if (data.error) listing = <p role="alert">{data.error}</p>;
+    else if (data.objects.length) listing = <ul>{data.objects.map(name => <li key={name}>
+      <a href={"#" + query({...location, path:name})}><FileText /> {name}</a></li>)}</ul>;
+    detail = <article><Folder /><h1>{record.files_id}</h1><code>{record.object_prefix}</code>{listing}</article>;
+  }
   return <div className="workspace"><aside className="records" aria-label="Records"><h2>{entity.name}</h2>
     {data.items.map(item => <a key={item.id} aria-current={item.id === data.selected ? "page" : undefined}
       href={"#" + query({entity: entity.name, id: item.id})}>{item.label}
       {item.summary && <small>{item.summary[0]} · {item.summary[1] || "Unassigned"}</small>}</a>)}</aside>
-    {!record ? <article><h1>{entity.name}</h1><p>No records yet.</p></article> :
-      "document_id" in record ? <article><div className="revision"><FileText /><label>Revision <select aria-label="Revision"
-        value={record.version_number} onChange={e => {window.location.hash = query({...location, version: e.target.value});}}>
-        {data.versions.map(v => <option key={v}>{v}</option>)}</select></label></div>
-        <h1>{record.title}</h1><div className="content">{record.content}</div></article> :
-      "ticket_id" in record ? <article><TicketView ticket={record} statuses={entity.statuses || []} csrf={csrf} refresh={() => setGeneration(g => g + 1)} /></article> :
-      path ? <Preview {...location} path={path}/> : <article><Folder /><h1>{record.files_id}</h1><code>{record.object_prefix}</code>
-        {data.error ? <p role="alert">{data.error}</p> : !data.objects.length ? <p>This collection is empty.</p> :
-          <ul>{data.objects.map(name => <li key={name}><a href={"#" + query({...location,path:name})}><FileText /> {name}</a></li>)}</ul>}</article>}
+    {detail}
   </div>;
 }

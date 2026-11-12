@@ -14,8 +14,8 @@ const icons = { document: FileText, ticket: SquareCheck, files: Folder };
 
 function App() {
   const {data, error} = useResource<Workspace>("/api/config");
-  const hash = useSyncExternalStore(subscribe, () => window.location.hash);
-  const [nav, setNav] = useState(() => window.innerWidth > 700);
+  const hash = useSyncExternalStore<string>(subscribe, () => window.location.hash);
+  const [nav, setNav] = useState<boolean>(() => window.innerWidth > 700);
   if (!data) return <main role="status">{error || "Loading workspace…"}</main>;
   const route = new URLSearchParams(hash.slice(1));
   const entities = data.config.entities;

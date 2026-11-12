@@ -1,15 +1,16 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import type { Ticket } from "../../schemas";
+import { TicketTemplate } from "./templates/TicketTemplate";
 import { query } from "./api";
 
-export function TicketView({ ticket, statuses, csrf, refresh }: {
+interface TicketViewProps {
   ticket: Ticket; statuses: readonly string[]; csrf: string; refresh: () => void;
-}) {
-  const [error, setError] = useState("");
-  const [saving, setSaving] = useState(false);
-  return <div className="ticket"><section><small>{ticket.ticket_id}</small><h1>{ticket.title}</h1>
-    <div className="content">{ticket.description || "No description."}</div></section>
-    <form className="properties" onSubmit={async event => {
+}
+
+export function TicketView({ ticket, statuses, csrf, refresh }: TicketViewProps) {
+  const [error, setError] = useState<string>("");
+  const [saving, setSaving] = useState<boolean>(false);
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
       event.preventDefault();
       const body = new FormData(event.currentTarget);
       body.set("csrf", csrf);
@@ -22,11 +23,15 @@ export function TicketView({ ticket, statuses, csrf, refresh }: {
         refresh();
       } catch (e) { setError(e instanceof Error ? e.message : "Could not save changes."); }
       finally { setSaving(false); }
-    }}><h2>Properties</h2><label htmlFor="status">Status</label>
+  }
+
+  return <TicketTemplate identifier={ticket.ticket_id} title={ticket.title} description={ticket.description || "No description."} properties={
+    <form className="properties" onSubmit={handleSubmit}><h2>Properties</h2><label htmlFor="status">Status</label>
       <select id="status" name="status" defaultValue={ticket.status}>
         {!statuses.includes(ticket.status) && <option disabled>{ticket.status}</option>}
         {statuses.map(s => <option key={s}>{s}</option>)}</select>
       <label htmlFor="assignee">Assignee</label><input id="assignee" name="assignee" defaultValue={ticket.assignee || ""} placeholder="Unassigned" />
       {error && <p role="alert">{error}</p>}<button disabled={saving}>{saving ? "Saving…" : "Save changes"}</button>
-    </form></div>;
+    </form>
+  } />;
 }
