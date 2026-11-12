@@ -1,5 +1,6 @@
 """Wire contracts for the factory MCP tools."""
 
+from datetime import datetime
 from typing import Generic, Literal, TypeVar
 
 from pydantic import BaseModel, JsonValue, RootModel
@@ -71,3 +72,19 @@ Item = TypeVar("Item")
 class Page(BaseModel, Generic[Item]):
     items: list[Item]
     next_cursor: str | None
+
+
+class RepositorySummary(BaseModel):
+    repo_id: str
+    name: str
+
+
+class CommentResponse(BaseModel):
+    repo_id: str
+    comment_id: str
+    target_type: Literal["document", "ticket"]
+    target_id: str
+    author: str
+    body: str
+    resolved: bool
+    created_at: datetime
