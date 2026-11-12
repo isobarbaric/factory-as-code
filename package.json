@@ -1,0 +1,14 @@
+{
+  "name": "process-as-code",
+  "private": true,
+  "bin": {
+    "process": "./scripts/process.cjs"
+  },
+  "scripts": {
+    "build": "node scripts/process.cjs build"
+  },
+  "dependencies": {
+    "tsx": "4.23.15",
+    "typescript": "~5.9.3"
+  }
+}
