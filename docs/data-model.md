@@ -75,7 +75,7 @@ One row per object collection. Primary key: `(repo_name, files_id)`. Unique cons
 
 ## Using the models
 
-Install the Python dependencies with `python -m pip install -r requirements.txt`. Run `npm run build` to produce the manifest. From the repository root, the following creates the three tables in a new PostgreSQL database and inserts a ticket. Set `DATABASE_URL` to a `postgresql+psycopg://` connection URL.
+Install the locked Python dependencies with `uv sync --locked`. Run `npm run build` to produce the manifest. From the repository root, run the following with `uv run python` to create the three tables in a new PostgreSQL database and insert a ticket. Set `DATABASE_URL` to a `postgresql+psycopg://` connection URL.
 
 ```python
 import os
