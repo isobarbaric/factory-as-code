@@ -1,0 +1,197 @@
+/* Document prose, re-created from the Software Factory editor's reading scale. */
+
+.sofa-editor .ProseMirror {
+  outline: none;
+  min-width: 0;
+  overflow-wrap: break-word;
+  font-family: var(--font-family-document);
+  font-size: var(--text-doc-body);
+  line-height: var(--leading-doc-body);
+  letter-spacing: var(--tracking-doc-body);
+  color: var(--foreground);
+}
+
+.sofa-editor .ProseMirror > :first-child {
+  margin-top: 0;
+}
+
+.sofa-editor .ProseMirror strong {
+  font-weight: 600;
+}
+
+.sofa-editor .ProseMirror h1 {
+  font-size: var(--text-doc-h1);
+  line-height: var(--leading-doc-h1);
+  letter-spacing: var(--tracking-doc-h1);
+  font-weight: 500;
+  margin: 2rem 0 1rem;
+}
+
+.sofa-editor .ProseMirror h2 {
+  font-size: var(--text-doc-h2);
+  line-height: var(--leading-doc-h2);
+  letter-spacing: var(--tracking-doc-h2);
+  font-weight: 500;
+  margin: 1.75rem 0 0.875rem;
+}
+
+.sofa-editor .ProseMirror h3 {
+  font-size: var(--text-doc-h3);
+  line-height: var(--leading-doc-h3);
+  letter-spacing: var(--tracking-doc-h3);
+  font-weight: 500;
+  margin: 1.25rem 0 0.625rem;
+}
+
+.sofa-editor .ProseMirror h4,
+.sofa-editor .ProseMirror h5 {
+  font-size: var(--text-doc-h4);
+  line-height: var(--leading-doc-h4);
+  font-weight: 500;
+  margin: 1.125rem 0 0.5rem;
+}
+
+.sofa-editor .ProseMirror h6 {
+  font-size: var(--text-doc-h6);
+  font-weight: 500;
+  color: var(--muted-foreground);
+  margin: 1rem 0 0.5rem;
+}
+
+.sofa-editor .ProseMirror p {
+  margin: 0;
+}
+
+.sofa-editor .ProseMirror p + p {
+  margin-top: 1rem;
+}
+
+.sofa-editor .ProseMirror ul,
+.sofa-editor .ProseMirror ol {
+  margin: 1rem 0;
+  padding-left: 1.5rem;
+}
+
+.sofa-editor .ProseMirror ul {
+  list-style-type: disc;
+}
+
+.sofa-editor .ProseMirror ol {
+  list-style-type: decimal;
+}
+
+.sofa-editor .ProseMirror li + li {
+  margin-top: 0.625rem;
+}
+
+.sofa-editor .ProseMirror li > p + ul,
+.sofa-editor .ProseMirror li > p + ol {
+  margin-top: 0.625rem;
+  margin-bottom: 0;
+}
+
+.sofa-editor .ProseMirror a {
+  color: var(--link);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sofa-editor .ProseMirror code {
+  font-family: var(--font-family-mono);
+  background-color: var(--muted);
+  padding: 0.15em 0.375rem;
+  border-radius: var(--radius-md);
+  font-size: 0.875em;
+}
+
+.sofa-editor .ProseMirror pre {
+  background-color: var(--muted);
+  border: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-md);
+  margin: 1.5rem 0;
+  overflow-x: auto;
+}
+
+.sofa-editor .ProseMirror pre code {
+  background: transparent;
+  padding: 0;
+}
+
+.sofa-editor .ProseMirror blockquote {
+  border-left: 2px solid var(--border);
+  padding-left: 1rem;
+  margin: 1rem 0;
+  font-style: italic;
+  color: var(--muted-foreground);
+}
+
+.sofa-editor .ProseMirror hr {
+  border: none;
+  border-top: 2px solid var(--border);
+  margin: 2rem 0;
+}
+
+.sofa-editor .ProseMirror table {
+  border-collapse: collapse;
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.sofa-editor .ProseMirror th,
+.sofa-editor .ProseMirror td {
+  border: 1px solid var(--border);
+  padding: 0.375rem 0.625rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.sofa-editor .ProseMirror th {
+  background-color: var(--table-header);
+  font-weight: 500;
+}
+
+.sofa-editor .ProseMirror ::selection {
+  background-color: color-mix(in oklch, var(--color-brand-500) 24%, transparent);
+}
+
+.sofa-editor .ProseMirror p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  color: var(--subtle-foreground);
+  pointer-events: none;
+  float: left;
+  height: 0;
+}
+
+/* Compact editor for ticket descriptions: UI body size instead of the reading scale. */
+.sofa-editor.sofa-editor-compact .ProseMirror {
+  font-family: var(--font-family-ui);
+  font-size: var(--text-ui-p2);
+  line-height: var(--leading-ui-p2);
+  letter-spacing: var(--tracking-ui-p2);
+}
+
+.sofa-editor.sofa-editor-compact .ProseMirror h1,
+.sofa-editor.sofa-editor-compact .ProseMirror h2 {
+  font-size: var(--text-ui-h4);
+  line-height: var(--leading-ui-h4);
+  margin: 1rem 0 0.5rem;
+}
+
+.sofa-editor.sofa-editor-compact .ProseMirror h3 {
+  font-size: var(--text-ui-p1);
+  margin: 0.875rem 0 0.375rem;
+}
+
+.sofa-editor.sofa-editor-compact .ProseMirror ul,
+.sofa-editor.sofa-editor-compact .ProseMirror ol {
+  margin: 0.5rem 0;
+}
+
+.sofa-editor.sofa-editor-compact .ProseMirror li + li {
+  margin-top: 0.25rem;
+}
+
+.sofa-editor.sofa-editor-compact .ProseMirror p + p {
+  margin-top: 0.5rem;
+}
