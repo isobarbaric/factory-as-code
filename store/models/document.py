@@ -1,15 +1,19 @@
 from typing import Any
 
 from sqlalchemy import CheckConstraint, Column, Text, text
-from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Field, SQLModel
+
+from .metadata import metadata_constraints, metadata_type
 
 
 class Document(SQLModel, table=True):
     __tablename__ = "documents"
     __table_args__ = (
-        CheckConstraint("title ~ '[^[:space:]]'"),
-        CheckConstraint("jsonb_typeof(metadata) = 'object'"),
+        CheckConstraint("title ~ '[^[:space:]]'").ddl_if(dialect="postgresql"),
+        CheckConstraint("length(trim(title, char(9,10,11,12,13,32))) > 0").ddl_if(
+            dialect="sqlite"
+        ),
+        *metadata_constraints(),
     )
 
     repo_id: str = Field(sa_type=Text, primary_key=True)
@@ -19,5 +23,7 @@ class Document(SQLModel, table=True):
     content: str = Field(sa_type=Text)
     metadata_: dict[str, Any] = Field(
         default_factory=dict,
-        sa_column=Column("metadata", JSONB, nullable=False, server_default=text("'{}'::jsonb")),
+        sa_column=Column(
+            "metadata", metadata_type(), nullable=False, server_default=text("'{}'")
+        ),
     )
