@@ -12,7 +12,7 @@ class Ticket(SQLModel, table=True):
         CheckConstraint("jsonb_typeof(metadata) = 'object'"),
     )
 
-    repo_name: str = Field(sa_type=Text, primary_key=True)
+    repo_id: str = Field(sa_type=Text, primary_key=True)
     ticket_id: str = Field(sa_type=Text, primary_key=True)
     entity_name: str = Field(sa_type=Text)
     title: str = Field(sa_type=Text)

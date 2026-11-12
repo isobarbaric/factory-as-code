@@ -8,24 +8,24 @@ A repository defines which entities its team uses. A team might declare Blueprin
 | --- | --- |
 | Git repository | `.process/process.ts` declares entity names and types, an optional list of integration providers, and optional skill and automation root paths. The paths resolve relative to `.process/`. |
 | Build | `.process/dist/process.json` is a reproducible manifest of that configuration. Consumers can load it to resolve an entity name. |
-| PostgreSQL | Document revisions, current tickets, and file collections. IDs are strings scoped to an owner-qualified `repo_name`. |
+| PostgreSQL | Document revisions, current tickets, and file collections. IDs are strings scoped to an stable `repo_id`. |
 | Object store (proposed) | The bytes for each file, grouped under the collection's `object_prefix`. |
 
 ## Manifest validation
 
-Before inserting or updating a row, load the built manifest for its `repo_name`. Find the entry in `entities` whose `name` equals `entity_name`. Its `type` must match the destination table: `document` for `documents`, `ticket` for `tickets`, and `files` for `files`. Reject the write if validation cannot complete, including when the manifest is unavailable, the name is missing, or its type differs. Git owns the entity definitions.
+Before inserting or updating a row, load the built manifest for its `repo_id`. Find the entry in `entities` whose `name` equals `entity_name`. Its `type` must match the destination table: `document` for `documents`, `ticket` for `tickets`, and `files` for `files`. Reject the write if validation cannot complete, including when the manifest is unavailable, the name is missing, or its type differs. Git owns the entity definitions.
 
 ## PostgreSQL tables
 
-All three tables scope IDs to an owner-qualified repository name. JSONB metadata values must be JSON objects when present.
+All three tables scope IDs to a stable repository ID. JSONB metadata values must be JSON objects when present.
 
 ### documents
 
-One row per immutable revision. Primary key: `(repo_name, document_id, version_number)`.
+One row per immutable revision. Primary key: `(repo_id, document_id, version_number)`.
 
 | Column | Type | Nullable | Meaning or constraint |
 | --- | --- | --- | --- |
-| `repo_name` | text | No | Owning repository |
+| `repo_id` | text | No | Owning repository |
 | `document_id` | text | No | Stable across revisions |
 | `version_number` | integer | No | Positive, starts at 1 |
 | `entity_name` | text | No | Configured document entity |
@@ -34,11 +34,11 @@ One row per immutable revision. Primary key: `(repo_name, document_id, version_n
 
 ### tickets
 
-One row per current ticket. Primary key: `(repo_name, ticket_id)`.
+One row per current ticket. Primary key: `(repo_id, ticket_id)`.
 
 | Column | Type | Nullable | Meaning or constraint |
 | --- | --- | --- | --- |
-| `repo_name` | text | No | Owning repository |
+| `repo_id` | text | No | Owning repository |
 | `ticket_id` | text | No | Ticket identifier |
 | `entity_name` | text | No | Configured ticket entity |
 | `title` | text | No | Nonblank summary |
@@ -49,11 +49,11 @@ One row per current ticket. Primary key: `(repo_name, ticket_id)`.
 
 ### files
 
-One row per object collection. Primary key: `(repo_name, files_id)`. Unique constraint: `(repo_name, object_prefix)`.
+One row per object collection. Primary key: `(repo_id, files_id)`. Unique constraint: `(repo_id, object_prefix)`.
 
 | Column | Type | Nullable | Meaning or constraint |
 | --- | --- | --- | --- |
-| `repo_name` | text | No | Owning repository |
+| `repo_id` | text | No | Owning repository |
 | `files_id` | text | No | Collection identifier |
 | `entity_name` | text | No | Configured files entity |
 | `object_prefix` | text | No | Prefix in the repository's storage namespace |
@@ -71,7 +71,6 @@ One row per object collection. Primary key: `(repo_name, files_id)`. Unique cons
 
 - **Entity renames.** Records refer to the configured name. A rename from Blueprint to Design Brief would leave historical revisions referring to Blueprint. The simplest initial policy is to keep names in use resolvable and introduce a new name for future records. Supporting renames in place requires a way to resolve the old name.
 - **File retention.** Listing a prefix returns its current contents. If published reports must be reproducible, the writer needs to finish uploading before publishing the row and prevent later changes to that prefix.
-- **Repository identity.** The agreed record types use `repo_name`. A repository rename or transfer therefore needs either a coordinated update of its record keys or a stable repository identifier.
 
 ## Using the models
 
@@ -87,11 +86,13 @@ from process_store import ProcessSession, Ticket
 engine = create_engine(os.environ["DATABASE_URL"])
 SQLModel.metadata.create_all(engine)
 
-repo = "isobarbaric/process-as-code"
+repo = "github:12345"
 with ProcessSession(engine, manifests={repo: Path(".process/dist/process.json")}) as session:
-    session.add(Ticket(repo_name=repo, ticket_id="WO-1", entity_name="Work Order",
+    session.add(Ticket(repo_id=repo, ticket_id="WO-1", entity_name="Work Order",
                        title="Review the data model", description="", status="open"))
     session.commit()
 ```
 
 Use `ProcessSession` for ORM inserts and updates that require manifest validation. Direct SQL and bulk statements bypass the ORM flush hook. The Python attribute `metadata_` maps to the database column `metadata` because SQLAlchemy reserves the attribute name `metadata`.
+
+See [the local MCP server](mcp.md) for connection setup and migration of existing repository keys.

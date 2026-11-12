@@ -27,7 +27,7 @@ def validate_writes(session, flush_context, instances):
                 continue
             if isinstance(row, Document):
                 raise ValueError("Document revisions are immutable. Insert a new revision.")
-        repo = row.repo_name
+        repo = row.repo_id
         if repo not in catalogs:
             path = session.manifests.get(repo)
             if path is None:
