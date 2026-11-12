@@ -28,3 +28,29 @@ export interface ProcessConfig {
   automations?: { root: string };
   skills?: { root: string };
 }
+
+export type JsonValue = string | number | boolean | null | JsonObject | JsonValue[];
+
+export interface JsonObject {
+  [key: string]: JsonValue;
+}
+
+export interface DocumentRevision {
+  repo_name: string;
+  document_id: string;
+  entity_name: string;
+  version_number: number;
+  content: string;
+  metadata: JsonObject;
+}
+
+export interface Ticket {
+  repo_name: string;
+  ticket_id: string;
+  entity_name: string;
+  title: string;
+  description: string;
+  status: string;
+  assignee: string | null;
+  metadata?: JsonObject;
+}
