@@ -21,3 +21,21 @@ export default {
 ```
 
 Each entry defines an entity the team can create many times. Every work order, for example, has its own title and assignee and uses one of the statuses above. Teams choose their own names and ticket statuses. They can also list the integrations they use and point to the directories where they keep skills and automations.
+
+## Local CLI
+
+Run `npm ci` and `make setup` from this checkout once. From a project containing
+`.factory/factory.ts`, the `factory` CLI accepts four commands.
+
+| Command | Effect |
+| --- | --- |
+| `factory build` | Type-check and validate the config, then publish `.factory/dist/factory.json`. |
+| `factory connect --repo-id <id>` | Register the existing compiled manifest under a stable ID. |
+| `factory apply --repo-id <id>` | Build the config and then register it under that ID. |
+| `factory status --repo-id <id>` | Check the local registry. Exit 0 for registered, 1 for absent, or 2 for an error. |
+
+From this checkout, run `make apply REPO_ID=org:example PROJECT_DIR=/path/to/project`.
+The project directory defaults to the current checkout. Registration updates the
+ID-to-manifest mapping in `.local/repos.json`. Restart the API and any MCP
+connections after adding an ID or changing its path. Rebuilding at an already
+registered path makes the new manifest available on the next factory read.
