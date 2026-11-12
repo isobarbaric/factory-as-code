@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { FileText, Folder } from "lucide-react";
-import type { Entity } from "../../schemas";
+import { EntityType, type Entity } from "../../schemas";
 import { query, useResource, type Browse } from "./api";
 import { DocumentTemplate } from "./templates/DocumentTemplate";
 import { Preview } from "./Preview";
+import { DocumentNavigator } from "./DocumentNavigator";
+import { TicketTable } from "./TicketTable";
 import { TicketView } from "./TicketView";
 
 interface ModuleProps { entity: Entity; route: URLSearchParams; csrf: string }
@@ -21,23 +23,28 @@ export function Module({entity, route, csrf}: ModuleProps) {
   function handleVersionChange(version: number) {
     window.location.hash = query({...location, version: String(version)});
   }
+  if (entity.type === EntityType.Ticket) {
+    const ticketDetail = record && "ticket_id" in record
+      ? <TicketView ticket={record} statuses={entity.statuses} csrf={csrf} refresh={() => setGeneration(g => g + 1)} />
+      : null;
+    return <TicketTable entity={entity.name} items={data.items} selected={data.selected} detail={ticketDetail} />;
+  }
   let detail;
   if (!record) {
     detail = <article><h1>{entity.name}</h1><p>No records yet.</p></article>;
   } else if ("document_id" in record) {
     detail = <DocumentTemplate title={record.title} content={record.content} version={record.version_number}
       versions={data.versions} onVersionChange={handleVersionChange} />;
-  } else if ("ticket_id" in record) {
-    detail = <TicketView ticket={record} statuses={entity.statuses || []} csrf={csrf} refresh={() => setGeneration(g => g + 1)} />;
   } else if (path) {
     detail = <Preview {...location} path={path} />;
-  } else {
+  } else if ("files_id" in record) {
     let listing = <p>This collection is empty.</p>;
     if (data.error) listing = <p role="alert">{data.error}</p>;
     else if (data.objects.length) listing = <ul>{data.objects.map(name => <li key={name}>
       <a href={"#" + query({...location, path:name})}><FileText /> {name}</a></li>)}</ul>;
     detail = <article><Folder /><h1>{record.files_id}</h1><code>{record.object_prefix}</code>{listing}</article>;
   }
+  if (entity.type === EntityType.Document) return <div className="workspace doc-workspace"><DocumentNavigator entity={entity.name} items={data.items} selected={data.selected}/>{detail}</div>;
   return <div className="workspace"><aside className="records" aria-label="Records"><h2>{entity.name}</h2>
     {data.items.map(item => <a key={item.id} aria-current={item.id === data.selected ? "page" : undefined}
       href={"#" + query({entity: entity.name, id: item.id})}>{item.label}

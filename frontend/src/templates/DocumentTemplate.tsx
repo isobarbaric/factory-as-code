@@ -14,14 +14,15 @@ export function DocumentTemplate({ title, content, version, versions, onVersionC
     onVersionChange(Number(event.target.value));
   }
 
-  return <article>
-    <div className="revision">
-      <FileText />
+  return <section className="document-panel">
+    <header className="view-header document-header">
+      <FileText /><strong>{title}</strong>
       <label>Revision <select aria-label="Revision" value={version} onChange={handleVersionChange}>
         {versions.map(v => <option key={v}>{v}</option>)}
       </select></label>
-    </div>
-    <h1>{title}</h1>
+    </header>
+    <article className="document-page"><h1>{title}</h1>
     <div className="content">{content}</div>
-  </article>;
+    </article>
+  </section>;
 }

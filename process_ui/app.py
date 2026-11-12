@@ -78,7 +78,7 @@ def create_app():
                     row = next((r for r in records if getattr(r, id_col.key) == selected), None)
         if selected is not None and row is None:
             abort(404)
-        if selected is None and items:
+        if selected is None and items and model is not Ticket:
             return redirect(url_for("browse", entity=entity.name, id=items[0][0]))
         objects, error = [], None
         if isinstance(row, Files):
