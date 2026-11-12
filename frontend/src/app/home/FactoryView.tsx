@@ -1,4 +1,9 @@
 import { EntityType, type FactoryConfig } from "@factory-as-code/factory-config";
+import { Dialog as DialogPrimitive } from "radix-ui";
+import { useRef } from "react";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { StatusChip } from "@/components/StatusChip";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Repository } from "@/lib/api";
@@ -12,6 +17,7 @@ export function FactoryView({
   repo: Repository;
   config: FactoryConfig | undefined;
 }) {
+  const command = useRef<HTMLInputElement>(null);
   return (
     <>
       <PageHeader crumbs={[{ label: "Factory" }]} />
@@ -25,6 +31,45 @@ export function FactoryView({
               change this workspace.
             </p>
           </div>
+          <Dialog>
+            <DialogPrimitive.Trigger asChild>
+              <Button size="sm" variant="outline" className="self-start">Connect to MCP</Button>
+            </DialogPrimitive.Trigger>
+            <DialogContent
+              title="Connect to MCP"
+              description="From the Factory as Code checkout, run this command to print your local MCP client configuration."
+            >
+              <div className="flex gap-2">
+                <input
+                  ref={command}
+                  aria-label="MCP configuration command"
+                  className="bg-muted min-w-0 flex-1 rounded-md border px-3 font-mono"
+                  readOnly
+                  value="make mcp-config"
+                  onFocus={(event) => event.target.select()}
+                />
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={async () => {
+                    try {
+                      await navigator.clipboard.writeText("make mcp-config");
+                      toast.success("Command copied");
+                    } catch {
+                      command.current?.focus();
+                      toast.error("Copy the selected command manually.");
+                    }
+                  }}
+                >
+                  Copy command
+                </Button>
+              </div>
+              <p className="ui-p2">
+                Add the generated factory server entry to your MCP client, then reconnect.
+                The server can read all registered repositories.
+              </p>
+            </DialogContent>
+          </Dialog>
           {!config ? (
             <Skeleton className="h-48" />
           ) : (
