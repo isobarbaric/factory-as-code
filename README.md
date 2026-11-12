@@ -12,7 +12,15 @@ Register each project you want the local agent to access with its stable repo ID
 make register REPO_ID=my-project MANIFEST="../my-project/.process/dist/process.json"
 ```
 
-Registration validates the manifest and saves its absolute path under the ID. Repeating the command with the same ID updates the path. Node.js is only needed if you want to build a manifest from TypeScript.
+Registration validates the manifest and saves its absolute path under the ID. Repeating the command with the same ID updates the path. The Make target works without Node.js.
+
+With the Node CLI installed from this checkout (`npm link`), you can also register directly from the project root:
+
+```sh
+process connect --repo-id local:process-demo
+```
+
+The argument is the stable ID used in MCP queries and database rows. The CLI reads the project's `.process/dist/process.json` and registers it with the local store configured by this checkout.
 
 Run `make mcp-config` and copy the resulting JSON into your MCP client's configuration. The client launches the server over stdio and reads the registry at startup. Restart the connection after registering a project. Call `get_process` with the registered ID to read its manifest. Document and ticket lists start empty. `make mcp` is the manual stdio entrypoint.
 

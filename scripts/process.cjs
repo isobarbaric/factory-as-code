@@ -2,7 +2,6 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { execFileSync } = require("node:child_process");
-const { require: loadTypeScript } = require("tsx/cjs/api");
 
 function validate(config, base, schema) {
   if (!Array.isArray(config?.entities)) throw new Error("entities must be an array");
@@ -43,6 +42,7 @@ function validate(config, base, schema) {
 }
 
 function build() {
+  const { require: loadTypeScript } = require("tsx/cjs/api");
   const base = path.resolve(".process");
   const configPath = path.join(base, "process.ts");
   const schemaPath = path.resolve(__dirname, "../schemas/index.ts");
@@ -74,11 +74,33 @@ function build() {
   }
 }
 
-try {
-  if (process.argv.length !== 3 || process.argv[2] !== "build") {
-    throw new Error("Usage: process build");
+function connect(repoId) {
+  const manifest = path.resolve(".process/dist/process.json");
+  if (!fs.existsSync(manifest)) {
+    throw new Error("Missing .process/dist/process.json. Run process build in the project root first.");
   }
-  build();
+  const root = path.resolve(__dirname, "..");
+  execFileSync("uv", ["run", "--locked", "python", "-m", "scripts.local_setup", "--register"], {
+    cwd: root,
+    env: {
+      ...process.env,
+      PROCESS_REPOS: process.env.PROCESS_REPOS || path.join(root, ".local", "repos.json"),
+      REPO_ID: repoId,
+      MANIFEST: manifest,
+    },
+    stdio: "inherit",
+  });
+}
+
+try {
+  const [command, ...args] = process.argv.slice(2);
+  if (command === "build" && args.length === 0) {
+    build();
+  } else if (command === "connect" && args.length === 2 && args[0] === "--repo-id" && args[1].trim()) {
+    connect(args[1]);
+  } else {
+    throw new Error("Usage: process build | process connect --repo-id <stable-id>");
+  }
 } catch (error) {
   console.error(error.message);
   process.exitCode = 1;
