@@ -3,6 +3,7 @@ node_modules/
 .process-build-*/
 
 __pycache__/
+frontend/dist/
 .venv/
 
 .local/
