@@ -1,0 +1,32 @@
+:root { font: 15px/1.5 Inter, -apple-system, BlinkMacSystemFont, sans-serif; color: #272723; background: white; }
+* { box-sizing: border-box; }
+body { display: grid; grid-template-columns: 215px minmax(0,1fr); margin: 0; min-height: 100vh; }
+.sidebar { background: #f7f7f4; padding: 20px 14px; border-right: 1px solid #dddcd6; }
+.sidebar header { font-size: 18px; font-weight: 650; display: flex; align-items: center; gap: 9px; }
+.mark { background: #354737; color: white; border-radius: 5px; font-size: 14px; padding: 2px 8px; }
+.repo, small, article p { color: #60615c; }
+.repo { font-size: 12px; overflow-wrap: anywhere; margin: 18px 6px; }
+nav a,.list a { display: block; color: inherit; text-decoration: none; border-radius: 5px; padding: 7px 10px; }
+nav a:hover,.list a:hover { background: #f0f0eb; }
+a[aria-current=page] { background: #e7e9e2; font-weight: 600; }
+.settings { margin-top: 20px; }
+.bar { border-bottom: 1px solid #deded8; padding: 13px 24px; font-size: 13px; }
+.bar span { color: #888; margin: 0 8px; }
+.workspace { display: grid; grid-template-columns: minmax(160px,22%) minmax(0,1fr); min-height: calc(100vh - 47px); }
+.list { border-right: 1px solid #deded8; padding: 20px 10px; overflow-wrap: anywhere; }
+.list h2 { margin: 0 10px 12px; }
+.list small { display: block; font-weight: 400; }
+article { padding: clamp(20px,4vw,56px); overflow-wrap: anywhere; }
+h1 { font-size: clamp(23px,3vw,34px); line-height: 1.2; margin: 0 0 18px; }
+h2 { font-size: 15px; margin-top: 26px; }
+.heading,.ticket { display: flex; justify-content: space-between; gap: 20px; align-items: flex-start; }
+.ticket section { flex: 1; }
+.content, pre { white-space: pre-wrap; max-width: 75ch; }
+.properties { border-left: 1px solid #deded8; padding-left: 20px; width: 190px; }
+.properties h2 { margin-top: 0; }
+.properties label,.properties input,.properties select { display: block; width: 100%; margin-bottom: 12px; }
+input,select,button { font: inherit; font-size: 14px; padding: 5px 8px; border: 1px solid #c9cbc3; border-radius: 5px; background: white; }
+button { cursor: pointer; } a { color: #355738; } table { border-collapse: collapse; width: 100%; } td,th { padding: 9px 6px; border-bottom: 1px solid #ddd; text-align: left; }
+dd { margin: 0 0 12px; } dt { font-weight: 600; }
+@media (max-width: 850px) { .ticket,.heading { display: block; } .properties { width: auto; border: 0; padding: 20px 0; } }
+@media (max-width: 650px) { body,.workspace { display: block; } .workspace { min-height: auto; } .sidebar { padding: 12px; } nav { display: flex; flex-wrap: wrap; } .settings { margin: 0; } .repo { margin: 6px; } .list { padding: 12px; border-bottom: 1px solid #deded8; } }
