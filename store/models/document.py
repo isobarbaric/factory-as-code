@@ -11,7 +11,7 @@ class Document(SQLModel, table=True):
         CheckConstraint("jsonb_typeof(metadata) = 'object'"),
     )
 
-    repo_name: str = Field(sa_type=Text, primary_key=True)
+    repo_id: str = Field(sa_type=Text, primary_key=True)
     document_id: str = Field(sa_type=Text, primary_key=True)
     entity_name: str = Field(sa_type=Text)
     content: str = Field(sa_type=Text)

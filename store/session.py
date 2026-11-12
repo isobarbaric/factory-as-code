@@ -24,7 +24,7 @@ def validate_writes(session, flush_context, instances):
             continue
         if row in session.dirty and not session.is_modified(row):
             continue
-        repo = row.repo_name
+        repo = row.repo_id
         if repo not in catalogs:
             path = session.manifests.get(repo)
             if path is None:
