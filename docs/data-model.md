@@ -82,7 +82,7 @@ import os
 from pathlib import Path
 
 from sqlmodel import SQLModel, create_engine
-from process_store import ProcessSession, Ticket
+from store import ProcessSession, Ticket
 
 engine = create_engine(os.environ["DATABASE_URL"])
 SQLModel.metadata.create_all(engine)
