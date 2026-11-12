@@ -1,11 +1,10 @@
 import type { Entity } from "@factory-as-code/factory-config";
 import { FileText, Plus } from "lucide-react";
 import { useMemo, useState } from "react";
-import { EmptyState } from "@/components/EmptyState";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { Repository } from "@/lib/api";
-import { entityIcon, pluralize } from "@/lib/entities";
+import { pluralize } from "@/lib/entities";
 import { useDocuments } from "@/lib/queries";
 import { navigate } from "@/lib/router";
 import { PageHeader } from "../shell/PageHeader";
@@ -31,7 +30,6 @@ function DocumentIndex({ repo, entity }: { repo: Repository; entity: Entity }) {
   const { data: documents, isPending, isError, refetch } = useDocuments(repo.repo_id, entity.name);
   const [creating, setCreating] = useState(false);
   const plural = pluralize(entity.name);
-  const Icon = entityIcon(entity);
   const sorted = useMemo(
     () => [...(documents ?? [])].sort((a, b) => a.title.localeCompare(b.title)),
     [documents],
@@ -39,23 +37,14 @@ function DocumentIndex({ repo, entity }: { repo: Repository; entity: Entity }) {
 
   return (
     <>
-      <PageHeader
-        crumbs={[{ label: plural }]}
-        actions={
-          <Button size="sm" onClick={() => setCreating(true)}>
-            <Plus /> {entity.name}
-          </Button>
-        }
-      />
+      <PageHeader crumbs={[{ label: plural }]} />
       <div className="sf-scrollbar min-h-0 flex-1 overflow-y-auto">
         <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-6 py-10">
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col items-start gap-3">
             <h1 className="ui-h2">{plural}</h1>
-            <p className="ui-p2 text-muted-foreground">
-              {documents
-                ? `${documents.length} ${documents.length === 1 ? entity.name.toLowerCase() : plural.toLowerCase()} in ${repo.name}`
-                : " "}
-            </p>
+            <Button size="sm" variant="outline" onClick={() => setCreating(true)}>
+              <Plus /> New {entity.name}
+            </Button>
           </div>
           {isPending && (
             <div className="flex flex-col gap-2">
@@ -73,20 +62,6 @@ function DocumentIndex({ repo, entity }: { repo: Repository; entity: Entity }) {
               </button>
               .
             </p>
-          )}
-          {documents?.length === 0 && (
-            <div className="rounded-xl border border-dashed">
-              <EmptyState
-                icon={Icon}
-                title={`No ${plural} Yet`}
-                description={`${plural} written here are stored with ${repo.name}'s factory records, where agents can read them over MCP.`}
-                action={
-                  <Button size="sm" variant="outline" onClick={() => setCreating(true)}>
-                    <Plus /> New {entity.name}
-                  </Button>
-                }
-              />
-            </div>
           )}
           {sorted.length > 0 && (
             <ul className="bg-card flex flex-col overflow-hidden rounded-xl border">
