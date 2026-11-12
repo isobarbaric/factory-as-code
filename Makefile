@@ -1,5 +1,6 @@
 .DEFAULT_GOAL := setup
-export REPO_ID MANIFEST
+PROJECT_DIR ?= $(CURDIR)
+export REPO_ID MANIFEST PROJECT_DIR
 export DATABASE_URL := sqlite:///$(CURDIR)/.local/records.db
 export FACTORY_REPOS := $(CURDIR)/.local/repos.json
 API_PORT ?= 8020
@@ -7,11 +8,17 @@ UI_PORT ?= 5180
 SF_PLATFORM ?= $(HOME)/Documents/sf-platform
 SF_FONTS := $(SF_PLATFORM)/.cursor/skills/frontend-visual-design/init/assets/fonts
 
-.PHONY: setup register mcp mcp-config api ui fonts test
+.PHONY: setup apply status register mcp mcp-config api ui fonts test
 
 setup:
 	uv sync --locked
 	uv run --locked python -m scripts.local_setup
+
+apply:
+	@cd "$$PROJECT_DIR" && node "$(CURDIR)/scripts/factory.cjs" apply --repo-id "$$REPO_ID"
+
+status:
+	@node scripts/factory.cjs status --repo-id "$$REPO_ID"
 
 register:
 	@uv run --locked python -m scripts.local_setup --register

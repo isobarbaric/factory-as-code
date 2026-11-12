@@ -74,17 +74,26 @@ function build() {
   }
 }
 
+const root = path.resolve(__dirname, "..");
+const registry = path.resolve(root, process.env.FACTORY_REPOS || ".local/repos.json");
+
+function status(repoId) {
+  const registrations = JSON.parse(fs.readFileSync(registry, "utf8"));
+  const registered = Object.hasOwn(registrations, repoId);
+  console.log(registered ? `Registered ${repoId}: ${registrations[repoId]}` : `Unregistered ${repoId}`);
+  process.exitCode = registered ? 0 : 1;
+}
+
 function connect(repoId) {
   const manifest = path.resolve(".factory/dist/factory.json");
   if (!fs.existsSync(manifest)) {
     throw new Error("Missing .factory/dist/factory.json. Run factory build in the project root first.");
   }
-  const root = path.resolve(__dirname, "..");
   execFileSync("uv", ["run", "--locked", "python", "-m", "scripts.local_setup", "--register"], {
     cwd: root,
     env: {
       ...process.env,
-      FACTORY_REPOS: process.env.FACTORY_REPOS || path.join(root, ".local", "repos.json"),
+      FACTORY_REPOS: registry,
       REPO_ID: repoId,
       MANIFEST: manifest,
     },
@@ -96,12 +105,15 @@ try {
   const [command, ...args] = process.argv.slice(2);
   if (command === "build" && args.length === 0) {
     build();
-  } else if (command === "connect" && args.length === 2 && args[0] === "--repo-id" && args[1].trim()) {
+  } else if (command === "status" && args.length === 2 && args[0] === "--repo-id" && args[1].trim()) {
+    status(args[1].trim());
+  } else if (["connect", "apply"].includes(command) && args.length === 2 && args[0] === "--repo-id" && args[1].trim()) {
+    if (command === "apply") build();
     connect(args[1]);
   } else {
-    throw new Error("Usage: factory build | factory connect --repo-id <stable-id>");
+    throw new Error("Usage: factory build | factory connect --repo-id <stable-id> | factory apply --repo-id <stable-id> | factory status --repo-id <stable-id>");
   }
 } catch (error) {
   console.error(error.message);
-  process.exitCode = 1;
+  process.exitCode = process.argv[2] === "status" ? 2 : 1;
 }
