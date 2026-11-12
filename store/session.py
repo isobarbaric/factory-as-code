@@ -22,11 +22,8 @@ def validate_writes(session, flush_context, instances):
         kind = entity_types.get(type(row))
         if kind is None:
             continue
-        if row in session.dirty:
-            if not session.is_modified(row):
-                continue
-            if isinstance(row, Document):
-                raise ValueError("Document revisions are immutable. Insert a new revision.")
+        if row in session.dirty and not session.is_modified(row):
+            continue
         repo = row.repo_name
         if repo not in catalogs:
             path = session.manifests.get(repo)
