@@ -12,7 +12,7 @@ from mcp import ClientSession, StdioServerParameters
 from mcp.client.stdio import stdio_client
 from sqlmodel import Session, SQLModel, create_engine
 
-from process_store import Document, Ticket
+from store import Document, Ticket
 
 
 @unittest.skipUnless(
@@ -28,16 +28,11 @@ class ReadToolsTest(unittest.TestCase):
         SQLModel.metadata.create_all(engine)
         with Session(engine) as session:
             for repo in ("allowed", "hidden"):
-                for version in (1, 2):
-                    session.add(
-                        Document(
-                            repo_id=repo,
-                            document_id="1",
-                            entity_name="Plan",
-                            version_number=version,
-                            content=f"{repo}/{version}",
-                        )
+                session.add(
+                    Document(
+                        repo_id=repo, document_id="1", entity_name="Plan", content=repo
                     )
+                )
                 for i in range(51):
                     session.add(
                         Ticket(
@@ -65,7 +60,7 @@ class ReadToolsTest(unittest.TestCase):
             config.write_text(json.dumps({"allowed": "manifest.json"}))
             params = StdioServerParameters(
                 command=sys.executable,
-                args=["-m", "process_store.mcp_server"],
+                args=["-m", "store.mcp_server"],
                 env={"DATABASE_URL": url, "PROCESS_REPOS": str(config)},
             )
             async with (
@@ -82,7 +77,6 @@ class ReadToolsTest(unittest.TestCase):
                         "repo_id",
                         "document_id",
                         "entity_name",
-                        "version_number",
                         "content",
                         "metadata",
                     },
@@ -131,18 +125,12 @@ class ReadToolsTest(unittest.TestCase):
                 self.assertEqual(await call("get_process"), manifest)
                 self.assertEqual(
                     (await call("get_document", document_id="1"))["content"],
-                    "allowed/2",
-                )
-                self.assertEqual(
-                    (await call("get_document", document_id="1", version_number=1))[
-                        "content"
-                    ],
-                    "allowed/1",
+                    "allowed",
                 )
                 docs = await call("list_documents", entity_name="Plan")
                 self.assertEqual(
                     docs["items"],
-                    [{"document_id": "1", "entity_name": "Plan", "version_number": 2}],
+                    [{"document_id": "1", "entity_name": "Plan"}],
                 )
                 self.assertEqual(
                     (await call("get_ticket", ticket_id="1"))["title"], "allowed"

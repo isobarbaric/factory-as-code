@@ -16,7 +16,7 @@ The agent's MCP host launches a local process over stdio. Each connection has an
      "mcpServers": {
        "process": {
          "command": "uv",
-         "args": ["--directory", "/path/to/process-as-code", "run", "--locked", "python", "-m", "process_store.mcp_server"],
+         "args": ["--directory", "/path/to/process-as-code", "run", "--locked", "python", "-m", "store.mcp_server"],
          "env": {
            "PROCESS_REPOS": "/path/to/repos.json",
            "DATABASE_URL": "postgresql+psycopg://reader@localhost/process"
@@ -31,11 +31,9 @@ The host chooses the allowlist and credentials at startup. Give each local clien
 | Tool | Arguments | Result |
 | --- | --- | --- |
 | get_process | repo_id | Built manifest |
-| list_documents | repo_id, optional entity_name and cursor | ID, entity name and latest revision number per document |
-| get_document | repo_id, document_id, optional version_number | Full exact revision, defaulting to latest |
+| list_documents | repo_id, optional entity_name and cursor | Document ID and entity name |
+| get_document | repo_id, document_id | Full current document |
 | list_tickets | repo_id, optional entity_name, status, assignee and cursor | ID, entity name, title, status and assignee |
 | get_ticket | repo_id, ticket_id | Full current ticket |
 
 Lists return up to 50 items in ID order. Pass the returned `next_cursor` with the same repo and filters to continue. A null cursor marks the last page. Unknown repositories and missing records produce tool errors.
-
-Create the tables using the [SQLModel setup](data-model.md#using-the-models).

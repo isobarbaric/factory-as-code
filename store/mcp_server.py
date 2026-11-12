@@ -46,20 +46,18 @@ def create_server(engine, manifests: dict[str, Path]):
     def list_documents(
         repo_id: str, entity_name: str | None = None, cursor: str | None = None
     ) -> Page[DocumentSummary]:
-        """List the latest revision summary for each matching document."""
+        """List the summary for each matching document."""
         authorize(repo_id)
         return Page[DocumentSummary].model_validate(
             documents.list(repo_id, entity_name, cursor)
         )
 
     @server.tool()
-    def get_document(
-        repo_id: str, document_id: str, version_number: int | None = None
-    ) -> DocumentResponse:
-        """Read the specified revision, or the latest when no version is supplied."""
+    def get_document(repo_id: str, document_id: str) -> DocumentResponse:
+        """Read the current document."""
         authorize(repo_id)
         return DocumentResponse.model_validate(
-            record_dict(documents.get(repo_id, document_id, version_number))
+            record_dict(documents.get(repo_id, document_id))
         )
 
     @server.tool()

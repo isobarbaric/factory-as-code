@@ -44,7 +44,6 @@ class ProcessManifest(RootModel[ManifestFields]):
 class DocumentSummary(BaseModel):
     document_id: str
     entity_name: str
-    version_number: int
 
 
 class DocumentResponse(DocumentSummary):
