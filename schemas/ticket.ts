@@ -1,7 +1,7 @@
 import type { JsonObject } from "./json";
 
 export interface Ticket {
-  repo_name: string;
+  repo_id: string;
   ticket_id: string;
   entity_name: string;
   title: string;
