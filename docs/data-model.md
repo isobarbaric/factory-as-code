@@ -8,7 +8,7 @@ A repository defines which entities its team uses. A team might declare Blueprin
 | --- | --- |
 | Git repository | `.process/process.ts` declares entity names and types, an optional list of integration providers, and optional skill and automation root paths. The paths resolve relative to `.process/`. |
 | Build | `.process/dist/process.json` is a reproducible manifest of that configuration. Consumers can load it to resolve an entity name. |
-| Record store (proposed) | Document revisions, current tickets, and file collections. IDs are strings scoped to an owner-qualified `repo_name`. |
+| PostgreSQL | Document revisions, current tickets, and file collections. IDs are strings scoped to an owner-qualified `repo_name`. |
 | Object store (proposed) | The bytes for each file, grouped under the collection's `object_prefix`. |
 
 ## Manifest validation
@@ -73,4 +73,25 @@ One row per object collection. Primary key: `(repo_name, files_id)`. Unique cons
 - **File retention.** Listing a prefix returns its current contents. If published reports must be reproducible, the writer needs to finish uploading before publishing the row and prevent later changes to that prefix.
 - **Repository identity.** The agreed record types use `repo_name`. A repository rename or transfer therefore needs either a coordinated update of its record keys or a stable repository identifier.
 
-The existing build validates the repository configuration. The primary keys and write behavior above are proposed contracts for a future record store.
+## Using the models
+
+Install the Python dependencies with `python -m pip install -r requirements.txt`. Run `npm run build` to produce the manifest. From the repository root, the following creates the three tables in a new PostgreSQL database and inserts a ticket. Set `DATABASE_URL` to a `postgresql+psycopg://` connection URL.
+
+```python
+import os
+from pathlib import Path
+
+from sqlmodel import SQLModel, create_engine
+from process_store import ProcessSession, Ticket
+
+engine = create_engine(os.environ["DATABASE_URL"])
+SQLModel.metadata.create_all(engine)
+
+repo = "isobarbaric/process-as-code"
+with ProcessSession(engine, manifests={repo: Path(".process/dist/process.json")}) as session:
+    session.add(Ticket(repo_name=repo, ticket_id="WO-1", entity_name="Work Order",
+                       title="Review the data model", description="", status="open"))
+    session.commit()
+```
+
+Use `ProcessSession` for ORM inserts and updates that require manifest validation. Direct SQL and bulk statements bypass the ORM flush hook. The Python attribute `metadata_` maps to the database column `metadata` because SQLAlchemy reserves the attribute name `metadata`.
