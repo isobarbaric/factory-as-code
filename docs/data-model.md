@@ -95,4 +95,4 @@ with ProcessSession(engine, manifests={repo: Path(".process/dist/process.json")}
 
 Use `ProcessSession` for ORM inserts and updates that require manifest validation. Direct SQL and bulk statements bypass the ORM flush hook. The Python attribute `metadata_` maps to the database column `metadata` because SQLAlchemy reserves the attribute name `metadata`.
 
-See [the local MCP server](mcp.md) for connection setup and migration of existing repository keys.
+See [the local MCP server](mcp.md) for connection setup.

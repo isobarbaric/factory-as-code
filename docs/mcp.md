@@ -38,12 +38,4 @@ The host chooses the allowlist and credentials at startup. Give each local clien
 
 Lists return up to 50 items in ID order. Pass the returned `next_cursor` with the same repo and filters to continue. A null cursor marks the last page. Unknown repositories and missing records produce tool errors.
 
-## Existing databases
-
-For a fresh database use the SQLModel setup in [the data model](data-model.md). For existing databases, schedule a maintenance window and stop old readers and writers. The migration rewrites repository keys and takes exclusive locks on all three tables. Supply the verified old-name-to-ID mapping for every stored repo:
-
-```sh
-psql "$PGURL" -X -v repo_ids='{"owner/project":"github:12345"}' -f migrations/001_repo_ids.sql
-```
-
-Use a psql-compatible connection URL for PGURL. A missing mapping or lock timeout rolls back the transaction. Correct the mapping or drain connections and retry. After commit, deploy clients that use repo_id and key the writer's manifest map by the same IDs.
+Create the tables using the [SQLModel setup](data-model.md#using-the-models).
