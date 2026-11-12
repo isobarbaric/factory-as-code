@@ -73,7 +73,43 @@ class ReadToolsTest(unittest.TestCase):
                 ClientSession(*streams) as client,
             ):
                 await client.initialize()
-                names = {tool.name for tool in (await client.list_tools()).tools}
+                tools = {tool.name: tool for tool in (await client.list_tools()).tools}
+                names = set(tools)
+                for name, required in {
+                    "get_process": {"entities"},
+                    "list_documents": {"items", "next_cursor"},
+                    "get_document": {
+                        "repo_id",
+                        "document_id",
+                        "entity_name",
+                        "version_number",
+                        "content",
+                        "metadata",
+                    },
+                    "list_tickets": {"items", "next_cursor"},
+                    "get_ticket": {
+                        "repo_id",
+                        "ticket_id",
+                        "entity_name",
+                        "title",
+                        "description",
+                        "status",
+                        "assignee",
+                        "metadata",
+                    },
+                }.items():
+                    self.assertEqual(
+                        set(tools[name].outputSchema["required"]), required
+                    )
+                for name, id_field in [
+                    ("list_documents", "document_id"),
+                    ("list_tickets", "ticket_id"),
+                ]:
+                    schema = tools[name].outputSchema
+                    item_ref = schema["properties"]["items"]["items"]["$ref"]
+                    self.assertIn(
+                        id_field, schema["$defs"][item_ref.split("/")[-1]]["required"]
+                    )
                 self.assertEqual(
                     names,
                     {
