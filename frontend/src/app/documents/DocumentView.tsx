@@ -106,7 +106,7 @@ function DocumentEditor({
   const remove = useDeleteDocument(repo.repo_id);
   const [title, setTitle] = useState(document.title);
   const [saveState, setSaveState] = useState<SaveState>(SaveState.Saved);
-  const [showComments, setShowComments] = useState(true);
+  const [showComments, setShowComments] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const pending = useRef<{ title?: string; content?: string }>({});
   const timer = useRef<number | undefined>(undefined);
