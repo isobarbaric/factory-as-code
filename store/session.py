@@ -9,13 +9,13 @@ from .entities import entity_catalog
 from .models import Document, Files, Ticket
 
 
-class ProcessSession(Session):
+class FactorySession(Session):
     def __init__(self, bind, *, manifests: Mapping[str, Path], **kwargs):
         super().__init__(bind, **kwargs)
         self.manifests = manifests
 
 
-@event.listens_for(ProcessSession, "before_flush")
+@event.listens_for(FactorySession, "before_flush")
 def validate_writes(session, flush_context, instances):
     entity_types = {Document: "document", Ticket: "ticket", Files: "files"}
     catalogs = {}

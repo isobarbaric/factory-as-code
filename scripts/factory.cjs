@@ -36,24 +36,24 @@ function validate(config, base, schema) {
     const root = config[key]?.root;
     if (typeof root !== "string" || !root.trim() || path.isAbsolute(root) ||
         !fs.statSync(path.resolve(base, root), { throwIfNoEntry: false })?.isDirectory()) {
-      throw new Error(`${key}.root must point to an existing directory relative to .process/`);
+      throw new Error(`${key}.root must point to an existing directory relative to .factory/`);
     }
   }
 }
 
 function build() {
   const { require: loadTypeScript } = require("tsx/cjs/api");
-  const base = path.resolve(".process");
-  const configPath = path.join(base, "process.ts");
-  const schemaPath = require.resolve("@process-as-code/process-config");
-  if (!fs.existsSync(configPath)) throw new Error("Missing .process/process.ts");
-  const temp = fs.mkdtempSync(path.resolve(".process-build-"));
+  const base = path.resolve(".factory");
+  const configPath = path.join(base, "factory.ts");
+  const schemaPath = require.resolve("@factory-as-code/factory-config");
+  if (!fs.existsSync(configPath)) throw new Error("Missing .factory/factory.ts");
+  const temp = fs.mkdtempSync(path.resolve(".factory-build-"));
   try {
     const check = path.join(temp, "check.ts");
     fs.writeFileSync(check, [
-      `import type { ProcessConfig } from ${JSON.stringify(schemaPath)};`,
+      `import type { FactoryConfig } from ${JSON.stringify(schemaPath)};`,
       `import config from ${JSON.stringify(configPath)};`,
-      "config satisfies ProcessConfig;",
+      "config satisfies FactoryConfig;",
     ].join("\n"));
     execFileSync(process.execPath, [
       require.resolve("typescript/bin/tsc"), "--noEmit", "--strict",
@@ -63,28 +63,28 @@ function build() {
     const config = loadTypeScript(configPath, __filename).default;
     validate(config, base, loadTypeScript(schemaPath, __filename));
     const manifest = JSON.stringify(config, null, 2) + "\n";
-    const staged = path.join(temp, "process.json");
+    const staged = path.join(temp, "factory.json");
     fs.writeFileSync(staged, manifest);
     const dist = path.join(base, "dist");
     fs.mkdirSync(dist, { recursive: true });
-    fs.renameSync(staged, path.join(dist, "process.json"));
-    console.log("Built .process/dist/process.json");
+    fs.renameSync(staged, path.join(dist, "factory.json"));
+    console.log("Built .factory/dist/factory.json");
   } finally {
     fs.rmSync(temp, { recursive: true, force: true });
   }
 }
 
 function connect(repoId) {
-  const manifest = path.resolve(".process/dist/process.json");
+  const manifest = path.resolve(".factory/dist/factory.json");
   if (!fs.existsSync(manifest)) {
-    throw new Error("Missing .process/dist/process.json. Run process build in the project root first.");
+    throw new Error("Missing .factory/dist/factory.json. Run factory build in the project root first.");
   }
   const root = path.resolve(__dirname, "..");
   execFileSync("uv", ["run", "--locked", "python", "-m", "scripts.local_setup", "--register"], {
     cwd: root,
     env: {
       ...process.env,
-      PROCESS_REPOS: process.env.PROCESS_REPOS || path.join(root, ".local", "repos.json"),
+      FACTORY_REPOS: process.env.FACTORY_REPOS || path.join(root, ".local", "repos.json"),
       REPO_ID: repoId,
       MANIFEST: manifest,
     },
@@ -99,7 +99,7 @@ try {
   } else if (command === "connect" && args.length === 2 && args[0] === "--repo-id" && args[1].trim()) {
     connect(args[1]);
   } else {
-    throw new Error("Usage: process build | process connect --repo-id <stable-id>");
+    throw new Error("Usage: factory build | factory connect --repo-id <stable-id>");
   }
 } catch (error) {
   console.error(error.message);

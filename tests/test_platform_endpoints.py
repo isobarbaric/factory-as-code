@@ -29,10 +29,10 @@ class PlatformEndpointsTest(unittest.IsolatedAsyncioTestCase):
             "integrations": ["slack"],
             "skills": {"root": "skills"},
         }
-        self.manifest_path = self.root / "process.json"
+        self.manifest_path = self.root / "factory.json"
         self.manifest_path.write_text(json.dumps(self.manifest))
         registry = self.root / "repos.json"
-        registry.write_text(json.dumps({"demo": "process.json"}))
+        registry.write_text(json.dumps({"demo": "factory.json"}))
         url = f"sqlite:///{self.root}/records.db"
         self.engine = create_engine(url)
         self.addCleanup(self.engine.dispose)
@@ -40,7 +40,7 @@ class PlatformEndpointsTest(unittest.IsolatedAsyncioTestCase):
         self.params = StdioServerParameters(
             command=sys.executable,
             args=["-m", "store.mcp_server"],
-            env={"DATABASE_URL": url, "PROCESS_REPOS": str(registry)},
+            env={"DATABASE_URL": url, "FACTORY_REPOS": str(registry)},
         )
 
     @asynccontextmanager
@@ -57,13 +57,13 @@ class PlatformEndpointsTest(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(reply.isError, reply.content)
         return reply.structuredContent
 
-    async def test_get_process(self):
+    async def test_get_factory(self):
         async with self.client() as client:
-            self.assertEqual(await self.call(client, "get_process"), self.manifest)
+            self.assertEqual(await self.call(client, "get_factory"), self.manifest)
             self.manifest_path.write_text(
                 '{"entities": [{"name": "Task", "type": "ticket"}]}'
             )
-            reply = await client.call_tool("get_process", {"repo_id": "demo"})
+            reply = await client.call_tool("get_factory", {"repo_id": "demo"})
             self.assertTrue(reply.isError)
 
     async def test_get_document(self):

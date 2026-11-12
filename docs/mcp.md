@@ -2,11 +2,11 @@
 
 The agent's MCP host launches a local process over stdio. Each connection has an operator-configured allowlist of repository IDs. Use a stable ID from the source provider, such as `github:12345`, consistently when storing records and configuring the server. Repository renames preserve that ID.
 
-1. Build the manifest in each project with the existing process build command.
+1. Build the manifest in each project with the existing factory build command.
 2. Write a local JSON file mapping authorized repository IDs to their built manifest paths. Relative paths resolve from this JSON file. For example:
 
    ```json
-   {"github:12345": "/projects/payments/.process/dist/process.json"}
+   {"github:12345": "/projects/payments/.factory/dist/factory.json"}
    ```
 
 3. Configure the MCP client to launch the server. Replace the paths and supply a PostgreSQL connection with SELECT access to documents and tickets.
@@ -14,12 +14,12 @@ The agent's MCP host launches a local process over stdio. Each connection has an
    ```json
    {
      "mcpServers": {
-       "process": {
+       "factory": {
          "command": "uv",
-         "args": ["--directory", "/path/to/process-as-code", "run", "--locked", "python", "-m", "store.mcp_server"],
+         "args": ["--directory", "/path/to/factory-as-code", "run", "--locked", "python", "-m", "store.mcp_server"],
          "env": {
-           "PROCESS_REPOS": "/path/to/repos.json",
-           "DATABASE_URL": "postgresql+psycopg://reader@localhost/process"
+           "FACTORY_REPOS": "/path/to/repos.json",
+           "DATABASE_URL": "postgresql+psycopg://reader@localhost/factory"
          }
        }
      }
@@ -30,7 +30,7 @@ The host chooses the allowlist and credentials at startup. Give each local clien
 
 | Tool | Arguments | Result |
 | --- | --- | --- |
-| get_process | repo_id | Built manifest |
+| get_factory | repo_id | Built manifest |
 | list_documents | repo_id, optional entity_name and cursor | Document ID and entity name |
 | get_document | repo_id, document_id | Full current document |
 | list_tickets | repo_id, optional entity_name, status, assignee and cursor | ID, entity name, title, status and assignee |

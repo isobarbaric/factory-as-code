@@ -11,18 +11,18 @@ from pydantic import ValidationError
 from sqlmodel import SQLModel, create_engine
 
 from store import models  # Register all tables before create_all.
-from store.responses import ProcessManifest
+from store.responses import FactoryManifest
 
 
 def main():
     root = Path.cwd()
-    repos = Path(os.environ["PROCESS_REPOS"])
+    repos = Path(os.environ["FACTORY_REPOS"])
     if sys.argv[1:] == ["--client-config"]:
         print(
             json.dumps(
                 {
                     "mcpServers": {
-                        "process": {
+                        "factory": {
                             "command": shutil.which("uv"),
                             "args": [
                                 "--directory",
@@ -33,7 +33,7 @@ def main():
                                 "-m",
                                 "store.mcp_server",
                             ],
-                            "env": {"DATABASE_URL": os.environ["DATABASE_URL"], "PROCESS_REPOS": str(repos)},
+                            "env": {"DATABASE_URL": os.environ["DATABASE_URL"], "FACTORY_REPOS": str(repos)},
                         }
                     }
                 },
@@ -48,7 +48,7 @@ def main():
             raise SystemExit("Usage: make register REPO_ID=<id> MANIFEST=<path>")
         manifest = Path(path).expanduser().resolve()
         try:
-            ProcessManifest.model_validate_json(manifest.read_bytes())
+            FactoryManifest.model_validate_json(manifest.read_bytes())
         except (OSError, ValidationError) as exc:
             raise SystemExit(f"Invalid manifest {manifest}: {exc}") from exc
         if not repos.exists():

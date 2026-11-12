@@ -1,4 +1,4 @@
-"""Read process records over MCP stdio."""
+"""Read factory records over MCP stdio."""
 
 import json
 import os
@@ -12,7 +12,7 @@ from .responses import (
     DocumentResponse,
     DocumentSummary,
     Page,
-    ProcessManifest,
+    FactoryManifest,
     TicketResponse,
     TicketSummary,
 )
@@ -27,7 +27,7 @@ def record_dict(row):
 
 
 def create_server(engine, manifests: dict[str, Path]):
-    server = FastMCP("Process records")
+    server = FastMCP("Factory records")
 
     documents = DocumentRepository(engine)
     tickets = TicketRepository(engine)
@@ -37,10 +37,10 @@ def create_server(engine, manifests: dict[str, Path]):
             raise ValueError("Repository unavailable to this connection")
 
     @server.tool()
-    def get_process(repo_id: str) -> ProcessManifest:
-        """Read the repository's compiled process manifest."""
+    def get_factory(repo_id: str) -> FactoryManifest:
+        """Read the repository's compiled factory manifest."""
         authorize(repo_id)
-        return ProcessManifest.model_validate_json(manifests[repo_id].read_bytes())
+        return FactoryManifest.model_validate_json(manifests[repo_id].read_bytes())
 
     @server.tool()
     def list_documents(
@@ -86,7 +86,7 @@ def create_server(engine, manifests: dict[str, Path]):
 
 
 def main():
-    config = Path(os.environ["PROCESS_REPOS"]).resolve()
+    config = Path(os.environ["FACTORY_REPOS"]).resolve()
     manifests = {
         repo_id: config.parent / path
         for repo_id, path in json.loads(config.read_text()).items()

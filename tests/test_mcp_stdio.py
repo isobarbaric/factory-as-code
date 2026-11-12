@@ -59,7 +59,7 @@ class ReadToolsTest(unittest.TestCase):
             params = StdioServerParameters(
                 command=sys.executable,
                 args=["-m", "store.mcp_server"],
-                env={"DATABASE_URL": url, "PROCESS_REPOS": str(config)},
+                env={"DATABASE_URL": url, "FACTORY_REPOS": str(config)},
             )
             async with (
                 stdio_client(params) as streams,
@@ -69,7 +69,7 @@ class ReadToolsTest(unittest.TestCase):
                 tools = {tool.name: tool for tool in (await client.list_tools()).tools}
                 names = set(tools)
                 for name, required in {
-                    "get_process": {"entities"},
+                    "get_factory": {"entities"},
                     "list_documents": {"items", "next_cursor"},
                     "get_document": {
                         "repo_id",
@@ -106,7 +106,7 @@ class ReadToolsTest(unittest.TestCase):
                 self.assertEqual(
                     names,
                     {
-                        "get_process",
+                        "get_factory",
                         "get_document",
                         "list_documents",
                         "get_ticket",
@@ -121,7 +121,7 @@ class ReadToolsTest(unittest.TestCase):
                     self.assertFalse(result.isError, result.content)
                     return result.structuredContent
 
-                self.assertEqual(await call("get_process"), manifest)
+                self.assertEqual(await call("get_factory"), manifest)
                 self.assertEqual(
                     (await call("get_document", document_id="1"))["content"],
                     "allowed",

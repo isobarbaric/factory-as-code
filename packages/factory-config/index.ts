@@ -1,3 +1,3 @@
 export * from "./entity";
 export * from "./integration";
-export type { ProcessConfig } from "./process-config";
+export type { FactoryConfig } from "./factory-config";

@@ -1,4 +1,4 @@
-import { EntityType, type ProcessConfig } from "@process-as-code/process-config";
+import { EntityType, type FactoryConfig } from "@factory-as-code/factory-config";
 
 export default {
   entities: [
@@ -6,4 +6,4 @@ export default {
     { name: "Work Order", type: EntityType.Ticket, statuses: ["Open", "In progress", "Done"] },
     { name: "Test Report", type: EntityType.Files },
   ],
-} satisfies ProcessConfig;
+} satisfies FactoryConfig;

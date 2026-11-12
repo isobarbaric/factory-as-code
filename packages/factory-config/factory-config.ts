@@ -1,7 +1,7 @@
 import type { Entity } from "./entity";
 import type { Integration } from "./integration";
 
-export interface ProcessConfig {
+export interface FactoryConfig {
   entities: readonly Entity[];
   integrations?: readonly Integration[];
   automations?: { root: string };

@@ -1,6 +1,6 @@
 node_modules/
-.process/dist/
-.process-build-*/
+.factory/dist/
+.factory-build-*/
 
 __pycache__/
 .venv/

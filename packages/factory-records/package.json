@@ -1,5 +1,5 @@
 {
-  "name": "@process-as-code/process-config",
+  "name": "@factory-as-code/factory-records",
   "private": true,
   "exports": "./index.ts",
   "types": "./index.ts"

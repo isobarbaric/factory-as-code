@@ -1,4 +1,4 @@
-"""Wire contracts for the process MCP tools."""
+"""Wire contracts for the factory MCP tools."""
 
 from typing import Generic, Literal, TypeVar
 
@@ -35,7 +35,7 @@ class ManifestFields(TypedDict):
     automations: NotRequired[DirectoryRoot]
 
 
-class ProcessManifest(RootModel[ManifestFields]):
+class FactoryManifest(RootModel[ManifestFields]):
     pass
 
 

@@ -1,4 +1,4 @@
 from .models import Document, Files, Ticket
-from .session import ProcessSession
+from .session import FactorySession
 
-__all__ = ["Document", "Files", "Ticket", "ProcessSession"]
+__all__ = ["Document", "Files", "Ticket", "FactorySession"]

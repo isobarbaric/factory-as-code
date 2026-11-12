@@ -1,7 +1,7 @@
 .DEFAULT_GOAL := setup
 export REPO_ID MANIFEST
 export DATABASE_URL := sqlite:///$(CURDIR)/.local/records.db
-export PROCESS_REPOS := $(CURDIR)/.local/repos.json
+export FACTORY_REPOS := $(CURDIR)/.local/repos.json
 
 .PHONY: setup register mcp mcp-config test
 
