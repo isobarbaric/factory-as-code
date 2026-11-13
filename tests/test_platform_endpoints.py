@@ -26,7 +26,7 @@ class PlatformEndpointsTest(unittest.IsolatedAsyncioTestCase):
                 {"name": "Task", "type": "ticket", "statuses": ["Open", "Done"]},
                 {"name": "Bug", "type": "ticket", "statuses": ["Open"]},
             ],
-            "integrations": ["slack"],
+            "integrations": ["github"],
             "skills": {"root": "skills"},
         }
         self.manifest_path = self.root / "factory.json"

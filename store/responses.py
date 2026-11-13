@@ -19,16 +19,9 @@ class ManifestFields(TypedDict):
     integrations: NotRequired[
         list[
             Literal[
-                "gmail",
-                "googledrive",
-                "outlook",
-                "googlesheets",
-                "supabase",
-                "notion",
-                "slack",
-                "airtable",
+                "github",
                 "googledocs",
-                "hubspot",
+                "gmail",
             ]
         ]
     ]
